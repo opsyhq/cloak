@@ -1,6 +1,6 @@
 {
   "name": "@opsyhq/cloak",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "One-time secret sharing for humans & agents",
   "type": "module",
   "license": "MIT",

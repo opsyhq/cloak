@@ -1,7 +1,7 @@
 ---
 name: cloak
 description: Share one-time secrets between humans and agents via encrypted self-destructing links
-version: 0.1.1
+version: 0.1.2
 triggers:
   - "share a secret"
   - "send secret"
