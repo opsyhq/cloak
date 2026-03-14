@@ -23,7 +23,7 @@
 
 ---
 
-You need to send someone an API key, database password, or token. You can't put it in Slack, email, or a terminal log — it'll live there forever.
+Humans and agents need to exchange secrets — API keys, database passwords, tokens — without exposing them in chat logs, terminal history, or Slack threads. The exchange goes both ways: a human sends an agent a database password, an agent sends a human a generated API key.
 
 **Cloak creates encrypted, self-destructing secret links.** Share the link. It works once. Then the secret is permanently destroyed.
 
