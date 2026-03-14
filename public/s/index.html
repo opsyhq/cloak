@@ -72,8 +72,9 @@
     }
 
     /* States */
-    .state { display: none; }
+    .state { display: none; text-align: left; }
     .state.active { display: block; animation: fadeUp 0.3s ease-out; }
+    #state-ready { text-align: center; }
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(6px); }
@@ -81,6 +82,17 @@
     }
 
     /* Ready state */
+    kbd {
+      display: inline-block;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 400;
+      color: inherit;
+      opacity: 0.45;
+      margin-left: 0.3rem;
+      vertical-align: baseline;
+    }
+
     /* Ready */
     .reveal-hint {
       font-size: 0.8rem;
@@ -279,6 +291,7 @@
 
     /* Tablet */
     @media (max-width: 768px) {
+      kbd { display: none; }
       body { padding: 1.25rem; }
       .brand { margin-bottom: 1.75rem; }
       .brand-icon { width: 44px; height: 44px; }
@@ -344,7 +357,7 @@
     <!-- Ready -->
     <div class="state" id="state-ready">
       <p class="reveal-hint">This secret will be permanently destroyed after you view it.</p>
-      <button class="btn-reveal" id="reveal-btn">Reveal secret</button>
+      <button class="btn-reveal" id="reveal-btn">Reveal secret <kbd>&#9166;</kbd></button>
       <p class="reveal-warning">One-time only. No second chance.</p>
     </div>
 
@@ -355,7 +368,7 @@
         <div class="revealed-title">Secret revealed — now destroyed.</div>
       </div>
       <div class="secret-content" id="secret-content"></div>
-      <button class="btn-copy" id="copy-btn">Copy secret</button>
+      <button class="btn-copy" id="copy-btn">Copy <kbd>C</kbd></button>
       <p class="destroyed-note">This secret has been permanently deleted from the server.</p>
       <a href="/" class="create-link">Create your own secret</a>
     </div>
@@ -450,13 +463,28 @@
     document.getElementById("copy-btn").addEventListener("click", async () => {
       const btn = document.getElementById("copy-btn");
       await navigator.clipboard.writeText(document.getElementById("secret-content").textContent);
-      btn.textContent = "Copied!";
+      btn.innerHTML = "Copied!";
       btn.classList.add("copied");
-      setTimeout(() => { btn.textContent = "Copy secret"; btn.classList.remove("copied"); }, 2000);
+      setTimeout(() => { btn.innerHTML = 'Copy <kbd>C</kbd>'; btn.classList.remove("copied"); }, 2000);
     });
 
     document.getElementById("agent-toggle").addEventListener("click", () => {
       document.getElementById("agent-panel").classList.toggle("visible");
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener("keydown", (e) => {
+      // Enter: reveal secret
+      if (e.key === "Enter" && document.getElementById("state-ready").classList.contains("active")) {
+        e.preventDefault();
+        document.getElementById("reveal-btn").click();
+      }
+
+      // C: copy secret
+      if (e.key === "c" && !e.metaKey && !e.ctrlKey && document.getElementById("state-revealed").classList.contains("active")) {
+        e.preventDefault();
+        document.getElementById("copy-btn").click();
+      }
     });
   </script>
 </body>
