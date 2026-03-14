@@ -306,15 +306,10 @@
 
     /* Tablet */
     @media (max-width: 768px) {
+      kbd { display: none; }
       body { padding: 1.25rem; }
       .brand { margin-bottom: 2rem; }
       .brand-icon { width: 44px; height: 44px; }
-      .result-card { padding: 1.25rem; }
-    }
-
-    /* Tablet — hide keyboard hints */
-    @media (max-width: 768px) {
-      kbd { display: none; }
     }
 
     /* Mobile */
@@ -329,12 +324,7 @@
       .form-row { flex-wrap: wrap; gap: 0.5rem; }
       .btn-create { width: 100%; margin-left: 0; padding: 0.65rem; }
       select { flex: 1; padding: 0.6rem 0.7rem; }
-      .result-card { padding: 1.15rem; }
-      .result-check { width: 36px; height: 36px; margin-bottom: 0.75rem; }
-      .result-title { font-size: 0.9rem; }
-      .url-text { font-size: 0.65rem; padding: 0.6rem 0.7rem; }
-      .btn-copy { padding: 0.6rem 0.85rem; font-size: 0.75rem; }
-      .btn-new { padding: 0.5rem 0.85rem; font-size: 0.75rem; }
+      .url-box { font-size: 0.65rem; padding: 0.65rem 0.75rem; }
       .result-note { font-size: 0.68rem; }
       .agent-toggle { margin-top: 1.5rem; }
       .agent-panel { padding: 0.75rem; font-size: 0.68rem; }
@@ -348,7 +338,7 @@
       .brand-icon { width: 36px; height: 36px; }
       .brand h1 { font-size: 1.1rem; }
       textarea { min-height: 100px; font-size: 0.75rem; }
-      .url-text { font-size: 0.6rem; }
+      .url-box { font-size: 0.6rem; }
     }
   </style>
 </head>

@@ -43,12 +43,12 @@
       max-width: 480px;
       position: relative;
       z-index: 1;
-      text-align: center;
     }
 
-    /* Brand */
+    /* Brand — matches index.html exactly */
     .brand {
-      margin-bottom: 2rem;
+      text-align: center;
+      margin-bottom: 2.5rem;
     }
 
     .brand-icon {
@@ -69,19 +69,10 @@
       color: #71717a;
       font-size: 0.82rem;
       margin-top: 0.3rem;
+      line-height: 1.5;
     }
 
-    /* States */
-    .state { display: none; text-align: left; }
-    .state.active { display: block; animation: fadeUp 0.3s ease-out; }
-    #state-ready { text-align: center; }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Ready state */
+    /* Shared components */
     kbd {
       display: inline-block;
       font-family: 'DM Sans', sans-serif;
@@ -93,20 +84,12 @@
       vertical-align: baseline;
     }
 
-    /* Ready */
-    .reveal-hint {
-      font-size: 0.8rem;
-      color: #52525b;
-      margin-bottom: 1rem;
-      line-height: 1.5;
-    }
-
-    .btn-reveal {
+    .btn-primary {
       background: #fafafa;
       color: #09090b;
       border: none;
       border-radius: 8px;
-      padding: 0.55rem 1.5rem;
+      padding: 0.55rem 1.3rem;
       font-family: 'DM Sans', sans-serif;
       font-size: 0.82rem;
       font-weight: 600;
@@ -114,10 +97,64 @@
       transition: transform 0.15s, opacity 0.15s;
     }
 
-    .btn-reveal:hover { transform: translateY(-1px); opacity: 0.92; }
-    .btn-reveal:active { transform: translateY(0); }
+    .btn-primary:hover { transform: translateY(-1px); opacity: 0.92; }
+    .btn-primary:active { transform: translateY(0); }
 
-    .reveal-warning {
+    .btn-secondary {
+      background: none;
+      border: none;
+      color: #52525b;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      cursor: pointer;
+      padding: 0;
+      transition: color 0.15s;
+    }
+
+    .btn-secondary:hover { color: #71717a; }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-dot.red { background: #ef4444; }
+
+    .status-text {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #a1a1aa;
+    }
+
+    /* States */
+    .state { display: none; }
+    .state.active { display: block; animation: fadeUp 0.3s ease-out; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Ready */
+    #state-ready { text-align: center; }
+
+    .reveal-hint {
+      font-size: 0.8rem;
+      color: #52525b;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .reveal-note {
       font-size: 0.7rem;
       color: #3f3f46;
       margin-top: 0.75rem;
@@ -125,6 +162,7 @@
 
     /* Loading */
     .loading-text {
+      text-align: center;
       color: #71717a;
       font-size: 0.85rem;
     }
@@ -144,27 +182,6 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Revealed */
-    .revealed-status {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.75rem;
-    }
-
-    .revealed-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #ef4444;
-      flex-shrink: 0;
-    }
-
-    .revealed-title {
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: #a1a1aa;
-    }
-
     .secret-content {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.82rem;
@@ -181,27 +198,15 @@
       margin-bottom: 0.85rem;
     }
 
-    .btn-copy {
-      background: #1e1e22;
-      color: #d4d4d8;
-      border: none;
-      border-radius: 6px;
-      padding: 0.45rem 0.85rem;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.76rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
+    .revealed-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    .btn-copy:hover { background: #27272a; }
-    .btn-copy.copied { color: #22c55e; background: rgba(34, 197, 94, 0.08); }
-
-    .destroyed-note {
+    .revealed-note {
       font-size: 0.7rem;
-      color: #ef4444;
-      opacity: 0.7;
-      margin-top: 0.75rem;
+      color: #3f3f46;
     }
 
     .create-link {
@@ -216,34 +221,13 @@
     .create-link:hover { color: #a1a1aa; }
 
     /* Error */
-    .error-status {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .error-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #ef4444;
-      flex-shrink: 0;
-    }
-
-    .error-label {
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: #a1a1aa;
-    }
-
     .error-text {
       color: #52525b;
       font-size: 0.8rem;
       line-height: 1.5;
     }
 
-    /* Agent toggle */
+    /* Agent panel — matches index.html exactly */
     .agent-toggle {
       background: none;
       border: 1px solid #1e1e22;
@@ -277,32 +261,36 @@
     .agent-panel p { margin-bottom: 0.35rem; }
     .agent-panel p:last-child { margin-bottom: 0; }
 
-    /* Footer */
+    /* Footer — matches index.html exactly */
     .footer {
       text-align: center;
-      margin-top: 2.5rem;
+      margin-top: 3rem;
       font-size: 0.72rem;
       color: #3f3f46;
       line-height: 1.8;
     }
 
-    .footer a { color: #52525b; text-decoration: none; transition: color 0.15s; }
+    .footer a {
+      color: #52525b;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
     .footer a:hover { color: #71717a; }
 
     /* Tablet */
     @media (max-width: 768px) {
       kbd { display: none; }
       body { padding: 1.25rem; }
-      .brand { margin-bottom: 1.75rem; }
+      .brand { margin-bottom: 2rem; }
       .brand-icon { width: 44px; height: 44px; }
-      .reveal-card, .secret-card, .error-card { padding: 1.5rem; }
     }
 
     /* Mobile */
     @media (max-width: 480px) {
       body { padding: 1rem 0.85rem; }
       .container { max-width: 100%; }
-      .brand { margin-bottom: 1.5rem; }
+      .brand { margin-bottom: 1.75rem; }
       .brand-icon { width: 40px; height: 40px; margin-bottom: 0.75rem; }
       .brand h1 { font-size: 1.2rem; }
       .brand p { font-size: 0.78rem; }
@@ -350,34 +338,36 @@
     </div>
 
     <!-- Loading -->
-    <div class="state active" id="state-loading">
+    <div class="state" id="state-loading">
       <p class="loading-text"><span class="spinner"></span>Preparing...</p>
     </div>
 
     <!-- Ready -->
-    <div class="state" id="state-ready">
+    <div class="state active" id="state-ready">
       <p class="reveal-hint">This secret will be permanently destroyed after you view it.</p>
-      <button class="btn-reveal" id="reveal-btn">Reveal secret <kbd>&#9166;</kbd></button>
-      <p class="reveal-warning">One-time only. No second chance.</p>
+      <button class="btn-primary" id="reveal-btn">Reveal secret <kbd>&#9166;</kbd></button>
+      <p class="reveal-note">One-time only. No second chance.</p>
     </div>
 
     <!-- Revealed -->
     <div class="state" id="state-revealed">
-      <div class="revealed-status">
-        <div class="revealed-dot"></div>
-        <div class="revealed-title">Secret revealed — now destroyed.</div>
+      <div class="status-row">
+        <div class="status-dot red"></div>
+        <div class="status-text">Secret revealed — now destroyed.</div>
       </div>
       <div class="secret-content" id="secret-content"></div>
-      <button class="btn-copy" id="copy-btn">Copy <kbd>C</kbd></button>
-      <p class="destroyed-note">This secret has been permanently deleted from the server.</p>
+      <div class="revealed-footer">
+        <div class="revealed-note">Permanently deleted</div>
+        <button class="btn-secondary" id="copy-btn">Copy <kbd>C</kbd></button>
+      </div>
       <a href="/" class="create-link">Create your own secret</a>
     </div>
 
     <!-- Error -->
     <div class="state" id="state-error">
-      <div class="error-status">
-        <div class="error-dot"></div>
-        <div class="error-label">Not found</div>
+      <div class="status-row">
+        <div class="status-dot red"></div>
+        <div class="status-text">Not found</div>
       </div>
       <p class="error-text" id="error-msg"></p>
       <a href="/" class="create-link">Create a new secret</a>
@@ -473,15 +463,12 @@
       document.getElementById("agent-panel").classList.toggle("visible");
     });
 
-    // Keyboard shortcuts
     document.addEventListener("keydown", (e) => {
-      // Enter: reveal secret
       if (e.key === "Enter" && document.getElementById("state-ready").classList.contains("active")) {
         e.preventDefault();
         document.getElementById("reveal-btn").click();
       }
 
-      // C: copy secret
       if (e.key === "c" && !e.metaKey && !e.ctrlKey && document.getElementById("state-revealed").classList.contains("active")) {
         e.preventDefault();
         document.getElementById("copy-btn").click();
