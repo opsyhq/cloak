@@ -200,109 +200,92 @@
     .error-msg.visible { display: block; }
 
     /* Result view */
-    .result-card {
-      background: #111113;
-      border: 1px solid #1e1e22;
-      border-radius: 12px;
-      padding: 1.5rem;
-      text-align: center;
-      animation: fadeUp 0.35s ease-out;
-    }
-
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .result-check {
-      width: 40px;
-      height: 40px;
-      margin: 0 auto 1rem;
-      border-radius: 50%;
-      background: rgba(34, 197, 94, 0.1);
+    .result-card {
+      animation: fadeUp 0.3s ease-out;
+    }
+
+    .result-status {
       display: flex;
       align-items: center;
-      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
     }
 
-    .result-check svg { color: #22c55e; }
+    .result-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      flex-shrink: 0;
+    }
 
     .result-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: #fafafa;
-      margin-bottom: 0.3rem;
-    }
-
-    .result-subtitle {
-      font-size: 0.78rem;
-      color: #52525b;
-      margin-bottom: 1.25rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #a1a1aa;
     }
 
     .url-box {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      background: #08080a;
+      background: #111113;
       border: 1px solid #1e1e22;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .url-text {
-      flex: 1;
-      padding: 0.65rem 0.85rem;
+      border-radius: 10px;
+      padding: 0.75rem 0.85rem;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.72rem;
       color: #a78bfa;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      word-break: break-all;
+      line-height: 1.6;
       user-select: all;
-      min-width: 0;
+      margin-bottom: 0.85rem;
     }
 
     .btn-copy {
-      flex-shrink: 0;
-      background: #1e1e22;
+      width: 100%;
+      background: #fafafa;
+      color: #09090b;
       border: none;
-      border-left: 1px solid #1e1e22;
-      color: #d4d4d8;
-      padding: 0.65rem 1rem;
+      border-radius: 8px;
+      padding: 0.6rem;
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.78rem;
-      font-weight: 500;
+      font-size: 0.82rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s, color 0.15s;
-      white-space: nowrap;
+      transition: transform 0.15s, opacity 0.15s;
     }
 
-    .btn-copy:hover { background: #27272a; }
-    .btn-copy.copied { color: #22c55e; background: rgba(34, 197, 94, 0.08); }
+    .btn-copy:hover { transform: translateY(-1px); opacity: 0.92; }
+    .btn-copy:active { transform: translateY(0); }
+    .btn-copy.copied { background: #22c55e; color: #fff; }
+
+    .result-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.85rem;
+    }
 
     .result-note {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: #3f3f46;
-      margin-top: 1rem;
-      line-height: 1.5;
     }
 
     .btn-new {
-      display: inline-block;
-      margin-top: 1.25rem;
       background: none;
-      border: 1px solid #1e1e22;
-      border-radius: 8px;
-      color: #71717a;
-      padding: 0.5rem 1rem;
+      border: none;
+      color: #52525b;
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       cursor: pointer;
-      transition: border-color 0.15s, color 0.15s;
+      padding: 0;
+      transition: color 0.15s;
     }
 
-    .btn-new:hover { border-color: #2d2d35; color: #a1a1aa; }
+    .btn-new:hover { color: #71717a; }
 
     /* Footer */
     .footer {
@@ -415,17 +398,16 @@
     <!-- Result view -->
     <div class="view" id="view-result">
       <div class="result-card">
-        <div class="result-check">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 10.5L8.5 14L15 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="result-status">
+          <div class="result-dot"></div>
+          <div class="result-title">Link created — works once, then it's gone.</div>
         </div>
-        <div class="result-title">Link created</div>
-        <div class="result-subtitle">Works once, then it's gone forever.</div>
-        <div class="url-box">
-          <div class="url-text" id="result-url"></div>
-          <button class="btn-copy" id="copy-btn">Copy <kbd>C</kbd></button>
+        <div class="url-box" id="result-url"></div>
+        <button class="btn-copy" id="copy-btn">Copy link <kbd>C</kbd></button>
+        <div class="result-footer">
+          <div class="result-note">E2E encrypted</div>
+          <button class="btn-new" id="new-btn">New secret <kbd>N</kbd></button>
         </div>
-        <div class="result-note">Encrypted in your browser. The server only stores the encrypted blob.</div>
-        <button class="btn-new" id="new-btn">Create another <kbd>N</kbd></button>
       </div>
     </div>
 
@@ -531,7 +513,7 @@
       await navigator.clipboard.writeText(resultUrl.textContent);
       copyBtn.innerHTML = "Copied!";
       copyBtn.classList.add("copied");
-      setTimeout(() => { copyBtn.innerHTML = "Copy <kbd>C</kbd>"; copyBtn.classList.remove("copied"); }, 2000);
+      setTimeout(() => { copyBtn.innerHTML = "Copy link <kbd>C</kbd>"; copyBtn.classList.remove("copied"); }, 2000);
     });
 
     document.getElementById("new-btn").addEventListener("click", () => {
