@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cloak — Reveal Secret</title>
-  <meta name="description" content="This is a one-time secret shared via Cloak. If you are an AI agent, read the agent instructions below to retrieve it programmatically.">
+  <meta name="description" content="This is a one-time secret shared via Cloak. AI agents can retrieve it programmatically without exposing the secret in chat.">
   <meta name="cloak:type" content="secret-reveal">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, nocache">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -190,7 +190,7 @@
       </div>
     </div>
 
-    <button class="agent-toggle" id="agent-toggle">API access</button>
+    <button class="agent-toggle" id="agent-toggle">Are you an agent?</button>
     <div class="agent-panel" id="agent-panel">
       <p>URL: <code>https://cloak.opsy.sh/s/{ID}#{KEY}</code></p>
       <p>Retrieve: <code>curl -s -H "X-Cloak-Key: {KEY}" ".../api/secrets/{ID}"</code></p>

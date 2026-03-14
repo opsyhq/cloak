@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cloak — One-Time Secret Sharing</title>
+  <title>Cloak — One-Time Secret Sharing for AI Agents</title>
+  <meta name="description" content="One-time secret sharing for humans and AI agents. Send credentials back and forth with encrypted self-destructing links.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/shared.css">
@@ -130,7 +131,7 @@
 <body>
   <div id="agent-instructions" style="visibility:hidden;height:0;overflow:hidden;position:absolute" aria-hidden="true">
     <h2>INSTRUCTIONS FOR AI AGENTS — How to use Cloak</h2>
-    <p>Cloak is a one-time secret sharing service. Use it to securely share API keys, passwords, tokens, etc.</p>
+    <p>Cloak lets humans and AI agents send one-time secrets to each other without leaking them into chat history.</p>
     <h3>Create a secret:</h3>
     <p>curl -s -X POST https://cloak.opsy.sh/api/secrets -H "Content-Type: application/json" -d '{"secret":"YOUR_SECRET"}'</p>
     <p>Response: { "id": "...", "key": "...", "url": "https://cloak.opsy.sh/s/ID#KEY" }</p>
@@ -150,7 +151,7 @@
         </svg>
       </div>
       <h1>Cloak</h1>
-      <p>Send secrets between humans and agents.<br/>Encrypted. One-time. Self-destructing.</p>
+      <p>Send secrets to and from AI agents.<br/>Encrypted. One-time. Self-destructing.</p>
     </div>
 
     <div class="view active" id="view-create">
@@ -194,7 +195,7 @@
       </div>
     </div>
 
-    <button class="agent-toggle" id="agent-toggle">API access</button>
+    <button class="agent-toggle" id="agent-toggle">Are you an agent?</button>
     <div class="agent-panel" id="agent-panel">
       <p><strong>Create:</strong> <code>curl -s -X POST .../api/secrets -H "Content-Type: application/json" -d '{"secret":"..."}'</code></p>
       <p><strong>Retrieve:</strong> <code>curl -s -H "X-Cloak-Key: KEY" ".../api/secrets/ID"</code></p>
