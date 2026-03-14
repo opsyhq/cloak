@@ -1,8 +1,9 @@
 name: Publish to ClawHub
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v*"
 
 jobs:
   publish:
@@ -19,9 +20,10 @@ jobs:
       - run: clawhub login --token ${{ secrets.CLAWHUB_TOKEN }}
 
       - run: |
+          VERSION="${GITHUB_REF_NAME#v}"
           clawhub publish skill/ \
             --slug cloak \
             --name "Cloak" \
-            --version ${{ github.event.release.tag_name }} \
-            --changelog "${{ github.event.release.body }}" \
+            --version "$VERSION" \
+            --changelog "Release $VERSION" \
             --tags "security,secrets,encryption"
