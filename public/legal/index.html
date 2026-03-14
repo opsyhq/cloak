@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloak — Privacy & Terms</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared.css">
+  <style>
+    .legal-content {
+      max-width: 540px;
+      line-height: 1.7;
+    }
+
+    .legal-content h2 {
+      color: #fafafa;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 2rem;
+    }
+
+    .legal-content h2:first-child {
+      margin-top: 0;
+    }
+
+    .legal-content p {
+      color: #71717a;
+      font-size: 0.82rem;
+      margin-top: 0.6rem;
+    }
+
+    .legal-content ul {
+      color: #71717a;
+      font-size: 0.82rem;
+      margin-top: 0.6rem;
+      padding-left: 1.25rem;
+    }
+
+    .legal-content li {
+      margin-top: 0.35rem;
+    }
+
+    .legal-content a {
+      color: #6366f1;
+      text-decoration: none;
+    }
+
+    .legal-content a:hover {
+      text-decoration: underline;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      color: #52525b;
+      font-size: 0.76rem;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .back-link:hover { color: #a1a1aa; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#d4d4d8" d="M254.07 19.707c-56.303 28.998-106.297 107.317-122.64 168.707 32.445 2.11 58.63 12.963 78.638 30.848l9.334-10.198c-13.336-13.056-30.596-23.9-52.994-34.707 12.68-31.542 32.01-79.29 56.598-82.07 9.62-1.088 19.92 4.722 31.13 21.068 35.08-58.334 68.394 18.705 87.727 61.002-21.94 11.897-39.132 22.82-52.63 36.024l8.68 9.76c19.68-17.732 45.72-29.358 78.55-31.673C358.24 127.335 311.515 50.14 254.07 19.707zM219.617 144.57c-8.894 0-16.103 3.952-16.103 8.826 0 4.875 7.21 8.827 16.103 8.827 8.894 0 16.106-3.95 16.106-8.827 0-4.874-7.212-8.826-16.106-8.826zm68.965 0c-8.894 0-16.105 3.952-16.105 8.826 0 4.875 7.21 8.827 16.105 8.827 8.894 0 16.106-3.95 16.106-8.827 0-4.874-7.212-8.826-16.106-8.826zm-118.894 70.88a233.216 233.216 0 0 0-6.444 11.52c-25.587 48.98-43.26 123.643-43.896 223.48 32.776 18.89 64.322 31.324 95.707 36.988-35.5-24.36-60.375-80.893-60.375-146.754 0-45.97 12.12-87.39 31.51-116.506a96.185 96.185 0 0 0-16.502-8.727zm168.933.35a98.526 98.526 0 0 0-16.298 8.764c19.24 29.095 31.254 70.354 31.254 116.12 0 65.82-24.844 122.322-60.306 146.707 30.88-5.598 62.44-17.812 95.656-36.947-.638-99.57-18.31-174.163-43.9-223.177a233.816 233.816 0 0 0-6.405-11.467zm-97.665 23.61c7.026 22.543 9.128 45.086.98 67.63h-41.552v18.513c10.057-3.24 20.25-5.39 30.502-6.594.066 50.215 1.313 96.574 19.82 145.435l4.193 11.074 4.485-10.962c19.48-47.615 18.045-95.297 17.933-145.024 10.257 1.333 20.463 3.4 30.545 6.07v-18.515h-41.374c-6.888-22.544-5.932-45.087.803-67.63h-26.335z"/>
+        </svg>
+      </div>
+      <h1>Cloak</h1>
+    </div>
+
+    <div class="legal-content">
+      <h2>Privacy</h2>
+      <p>Cloak is designed so that we <strong>cannot</strong> read your secrets.</p>
+      <ul>
+        <li>Secrets are encrypted in your browser before they reach our server. The encryption key is part of the URL fragment and never sent to us.</li>
+        <li>We store only the encrypted ciphertext and a server-generated ID. We cannot decrypt your data.</li>
+        <li>Secrets are permanently deleted after one read or when the TTL expires.</li>
+        <li>We do not use cookies, analytics, or tracking of any kind.</li>
+        <li>No personal information is collected or stored.</li>
+      </ul>
+
+      <h2>Terms of Use</h2>
+      <p>Cloak is provided as-is, without warranty. By using the service you agree to the following:</p>
+      <ul>
+        <li>Do not use Cloak for illegal activity.</li>
+        <li>We reserve the right to rate-limit or block abusive usage.</li>
+        <li>Secrets are ephemeral by design. We are not responsible for data loss after a secret is viewed or expires.</li>
+        <li>The service may be discontinued at any time.</li>
+      </ul>
+
+      <h2>Open Source</h2>
+      <p>Cloak is open source under the <a href="https://github.com/opsyhq/cloak/blob/main/LICENSE">Apache 2.0 License</a>.</p>
+      <p>Source code: <a href="https://github.com/opsyhq/cloak">github.com/opsyhq/cloak</a></p>
+
+      <h2>Credits</h2>
+      <p>"Cloak and Dagger" icon by <a href="https://lorcblog.blogspot.com">Lorc</a>, available on <a href="https://game-icons.net">game-icons.net</a>, licensed under <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+    </div>
+
+    <div class="footer">
+      <a href="/">&larr; Back to Cloak</a>
+    </div>
+  </div>
+</body>
+</html>

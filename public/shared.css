@@ -255,6 +255,18 @@ kbd {
 
 .footer a:hover { color: #71717a; }
 
+.legal-link {
+  display: block;
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.62rem;
+  color: #2a2a2e;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.legal-link:hover { color: #52525b; }
+
 @media (max-width: 768px) {
   kbd { display: none; }
   body { padding: 1.25rem; }
