@@ -175,6 +175,17 @@
       transition: transform 0.15s, opacity 0.15s;
     }
 
+    kbd {
+      display: inline-block;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 400;
+      color: inherit;
+      opacity: 0.45;
+      margin-left: 0.3rem;
+      vertical-align: baseline;
+    }
+
     .btn-create:hover { transform: translateY(-1px); opacity: 0.92; }
     .btn-create:active { transform: translateY(0); }
     .btn-create:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
@@ -318,6 +329,11 @@
       .result-card { padding: 1.25rem; }
     }
 
+    /* Tablet — hide keyboard hints */
+    @media (max-width: 768px) {
+      kbd { display: none; }
+    }
+
     /* Mobile */
     @media (max-width: 480px) {
       body { padding: 1rem 0.85rem; }
@@ -390,7 +406,7 @@
             <option value="259200">3 days</option>
             <option value="604800">7 days</option>
           </select>
-          <button type="submit" class="btn-create" id="submit-btn" title="Cmd+Enter">Create link</button>
+          <button type="submit" class="btn-create" id="submit-btn">Create link <kbd>&#8984;&#9166;</kbd></button>
         </div>
       </form>
       <div class="error-msg" id="error"></div>
@@ -406,10 +422,10 @@
         <div class="result-subtitle">Works once, then it's gone forever.</div>
         <div class="url-box">
           <div class="url-text" id="result-url"></div>
-          <button class="btn-copy" id="copy-btn" title="Press C">Copy</button>
+          <button class="btn-copy" id="copy-btn">Copy <kbd>C</kbd></button>
         </div>
         <div class="result-note">Encrypted in your browser. The server only stores the encrypted blob.</div>
-        <button class="btn-new" id="new-btn" title="Press N">Create another</button>
+        <button class="btn-new" id="new-btn">Create another <kbd>N</kbd></button>
       </div>
     </div>
 
@@ -468,7 +484,7 @@
       e.preventDefault();
       errorEl.classList.remove("visible");
       submitBtn.disabled = true;
-      submitBtn.textContent = "Encrypting...";
+      submitBtn.innerHTML = "Encrypting...";
 
       try {
         const plaintext = secretEl.value.trim();
@@ -507,15 +523,15 @@
         errorEl.classList.add("visible");
       } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = "Create link";
+        submitBtn.innerHTML = 'Create link <kbd>&#8984;&#9166;</kbd>';
       }
     });
 
     copyBtn.addEventListener("click", async () => {
       await navigator.clipboard.writeText(resultUrl.textContent);
-      copyBtn.textContent = "Copied!";
+      copyBtn.innerHTML = "Copied!";
       copyBtn.classList.add("copied");
-      setTimeout(() => { copyBtn.textContent = "Copy"; copyBtn.classList.remove("copied"); }, 2000);
+      setTimeout(() => { copyBtn.innerHTML = "Copy <kbd>C</kbd>"; copyBtn.classList.remove("copied"); }, 2000);
     });
 
     document.getElementById("new-btn").addEventListener("click", () => {
