@@ -1,5 +1,5 @@
 {
-  "name": "@opsy/cloak",
+  "name": "@opsyhq/cloak",
   "version": "0.1.0",
   "description": "One-time secret sharing for humans & agents",
   "type": "module",
