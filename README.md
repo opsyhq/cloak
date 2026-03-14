@@ -269,5 +269,5 @@ BASE_URL = "https://secrets.yourdomain.com"
 ---
 
 <p align="center">
-  Built by <a href="https://github.com/opsyhq"><strong>OpsyHQ</strong></a> · MIT License
+  Built by <a href="https://github.com/opsyhq"><strong>OpsyHQ</strong></a> · Apache-2.0 License
 </p>
