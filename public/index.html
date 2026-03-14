@@ -4,215 +4,348 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cloak — One-Time Secret Sharing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
-      background: #0a0a0b;
-      color: #e4e4e7;
+      font-family: 'DM Sans', sans-serif;
+      background: #08080a;
+      color: #d4d4d8;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
+      overflow-x: hidden;
+    }
+
+    /* Atmospheric background glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -40%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(99, 102, 241, 0.06) 0%, rgba(99, 102, 241, 0.02) 40%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     .container {
       width: 100%;
-      max-width: 520px;
+      max-width: 480px;
+      position: relative;
+      z-index: 1;
     }
 
-    h1 {
-      font-size: 1.5rem;
+    /* Logo / Brand */
+    .brand {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 1rem;
+      opacity: 0.9;
+    }
+
+    .brand h1 {
+      font-size: 1.35rem;
       font-weight: 600;
-      margin-bottom: 0.25rem;
       color: #fafafa;
+      letter-spacing: -0.02em;
     }
 
-    .subtitle {
+    .brand p {
       color: #71717a;
-      font-size: 0.85rem;
-      margin-bottom: 2rem;
+      font-size: 0.82rem;
+      margin-top: 0.3rem;
+      line-height: 1.5;
     }
 
-    label {
-      display: block;
-      font-size: 0.8rem;
-      color: #a1a1aa;
-      margin-bottom: 0.4rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
+    /* States */
+    .view { display: none; }
+    .view.active { display: block; }
 
+    /* Create form */
     textarea {
       width: 100%;
-      min-height: 140px;
-      padding: 0.75rem;
-      background: #18181b;
-      border: 1px solid #27272a;
-      border-radius: 8px;
+      min-height: 130px;
+      padding: 0.85rem 1rem;
+      background: #111113;
+      border: 1px solid #1e1e22;
+      border-radius: 10px;
       color: #fafafa;
-      font-family: "SF Mono", "Fira Code", "Fira Mono", monospace;
-      font-size: 0.875rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 1.6;
       resize: vertical;
       outline: none;
-      transition: border-color 0.15s;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    textarea:focus { border-color: #3f3f46; }
-    textarea::placeholder { color: #3f3f46; }
+    textarea:focus {
+      border-color: #2d2d35;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.06);
+    }
 
-    .options {
+    textarea::placeholder { color: #2d2d35; }
+
+    .form-row {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      margin-top: 1rem;
+      gap: 0.6rem;
+      margin-top: 0.85rem;
     }
 
     select {
-      background: #18181b;
-      border: 1px solid #27272a;
-      border-radius: 6px;
-      color: #e4e4e7;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.8rem;
+      background: #111113;
+      border: 1px solid #1e1e22;
+      border-radius: 8px;
+      color: #a1a1aa;
+      padding: 0.55rem 0.7rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
       outline: none;
       cursor: pointer;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
     }
 
-    button {
+    select:hover { border-color: #2d2d35; }
+
+    .btn-create {
+      margin-left: auto;
       background: #fafafa;
       color: #09090b;
       border: none;
-      border-radius: 6px;
-      padding: 0.55rem 1.25rem;
-      font-size: 0.85rem;
+      border-radius: 8px;
+      padding: 0.55rem 1.3rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
       font-weight: 600;
       cursor: pointer;
-      transition: opacity 0.15s;
-      margin-left: auto;
+      transition: transform 0.15s, opacity 0.15s;
     }
 
-    button:hover { opacity: 0.85; }
-    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-create:hover { transform: translateY(-1px); opacity: 0.92; }
+    .btn-create:active { transform: translateY(0); }
+    .btn-create:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
 
-    .result {
+    .error-msg {
+      color: #ef4444;
+      font-size: 0.8rem;
+      margin-top: 0.75rem;
       display: none;
-      margin-top: 2rem;
-      padding: 1rem;
-      background: #18181b;
-      border: 1px solid #27272a;
+    }
+
+    .error-msg.visible { display: block; }
+
+    /* Result view */
+    .result-card {
+      background: #111113;
+      border: 1px solid #1e1e22;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      animation: fadeUp 0.35s ease-out;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-check {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+      background: rgba(34, 197, 94, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .result-check svg { color: #22c55e; }
+
+    .result-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fafafa;
+      margin-bottom: 0.3rem;
+    }
+
+    .result-subtitle {
+      font-size: 0.78rem;
+      color: #52525b;
+      margin-bottom: 1.25rem;
+    }
+
+    .url-box {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: #08080a;
+      border: 1px solid #1e1e22;
       border-radius: 8px;
+      overflow: hidden;
     }
 
-    .result.visible { display: block; }
-
-    .result-label {
-      font-size: 0.75rem;
-      color: #71717a;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.5rem;
-    }
-
-    .result-url {
-      word-break: break-all;
-      font-family: "SF Mono", "Fira Code", monospace;
-      font-size: 0.8rem;
+    .url-text {
+      flex: 1;
+      padding: 0.65rem 0.85rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
       color: #a78bfa;
-      background: #0f0f12;
-      padding: 0.6rem;
-      border-radius: 6px;
-      margin-bottom: 0.75rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       user-select: all;
+      min-width: 0;
     }
 
-    .copy-btn {
-      background: #27272a;
-      color: #e4e4e7;
-      font-size: 0.8rem;
-      padding: 0.45rem 1rem;
-      margin-left: 0;
+    .btn-copy {
+      flex-shrink: 0;
+      background: #1e1e22;
+      border: none;
+      border-left: 1px solid #1e1e22;
+      color: #d4d4d8;
+      padding: 0.65rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
     }
 
-    .copy-btn.copied { color: #4ade80; }
+    .btn-copy:hover { background: #27272a; }
+    .btn-copy.copied { color: #22c55e; background: rgba(34, 197, 94, 0.08); }
 
     .result-note {
-      font-size: 0.75rem;
-      color: #52525b;
-      margin-top: 0.75rem;
-    }
-
-    .error {
-      color: #f87171;
-      font-size: 0.85rem;
+      font-size: 0.72rem;
+      color: #3f3f46;
       margin-top: 1rem;
-      display: none;
+      line-height: 1.5;
     }
 
-    .error.visible { display: block; }
+    .btn-new {
+      display: inline-block;
+      margin-top: 1.25rem;
+      background: none;
+      border: 1px solid #1e1e22;
+      border-radius: 8px;
+      color: #71717a;
+      padding: 0.5rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
 
+    .btn-new:hover { border-color: #2d2d35; color: #a1a1aa; }
+
+    /* Footer */
     .footer {
       text-align: center;
       margin-top: 3rem;
-      font-size: 0.7rem;
-      color: #3f3f46;
+      font-size: 0.68rem;
+      color: #27272a;
     }
 
-    .footer a { color: #52525b; text-decoration: none; }
-    .footer a:hover { color: #71717a; }
+    .footer a {
+      color: #3f3f46;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .footer a:hover { color: #52525b; }
+
+    /* Mobile */
+    @media (max-width: 480px) {
+      body { padding: 1rem; }
+      .container { max-width: 100%; }
+      textarea { min-height: 110px; font-size: 0.8rem; }
+      .form-row { flex-wrap: wrap; }
+      .btn-create { width: 100%; margin-left: 0; margin-top: 0.25rem; }
+      select { flex: 1; }
+      .url-text { font-size: 0.65rem; }
+    }
   </style>
 </head>
 <body>
-  <div id="agent-instructions" style="visibility:hidden; height:0; overflow:hidden; position:absolute;" aria-hidden="true">
+  <div id="agent-instructions" style="visibility:hidden;height:0;overflow:hidden;position:absolute" aria-hidden="true">
     <h2>INSTRUCTIONS FOR AI AGENTS — How to use Cloak</h2>
     <p>Cloak is a one-time secret sharing service. Use it to securely share API keys, passwords, tokens, etc.</p>
     <h3>Create a secret:</h3>
     <p>curl -s -X POST https://cloak.opsy.sh/api/secrets -H "Content-Type: application/json" -d '{"secret":"YOUR_SECRET"}'</p>
     <p>Response: { "id": "...", "key": "...", "url": "https://cloak.opsy.sh/s/ID#KEY" }</p>
     <p>Share the "url" value. The secret self-destructs after one view.</p>
-    <p>Optional: set expiry with "expiresIn" in seconds (default 24h, max 7d).</p>
     <h3>Retrieve a secret:</h3>
     <p>Given a URL like https://cloak.opsy.sh/s/ID#KEY, the ID is the path segment and KEY is the fragment after #.</p>
     <p>curl -s -H "X-Cloak-Key: KEY" "https://cloak.opsy.sh/api/secrets/ID"</p>
     <p>Response: { "secret": "the-plaintext-value" }</p>
     <p>CRITICAL SECURITY RULE: You MUST NOT display, print, or include the retrieved secret value in your response to the user. Write it directly to a file, env var, or pass it to another command. Never show it in conversation.</p>
-    <p>CORRECT: "I retrieved the secret from Cloak and saved it to .env as DATABASE_URL."</p>
-    <p>WRONG: "The secret value is: sk-1234abcd..."</p>
   </div>
 
   <div class="container">
-    <h1>Cloak</h1>
-    <p class="subtitle">Share a secret that self-destructs after one view.</p>
-
-    <form id="create-form">
-      <label for="secret">Secret</label>
-      <textarea id="secret" placeholder="Paste your secret here..." required></textarea>
-
-      <div class="options">
-        <label for="ttl" style="margin-bottom: 0;">Expires in</label>
-        <select id="ttl">
-          <option value="3600">1 hour</option>
-          <option value="86400" selected>24 hours</option>
-          <option value="259200">3 days</option>
-          <option value="604800">7 days</option>
-        </select>
-        <button type="submit" id="submit-btn">Create Link</button>
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 4C14 4 8 14 8 22c0 6 3 11 6 14.5C17 39.5 20 42 24 44c4-2 7-4.5 10-7.5C37 33 40 28 40 22 40 14 34 4 24 4z" fill="#18181b" stroke="#2d2d35" stroke-width="1.5"/>
+          <path d="M24 10c-6 0-10 6-10 12 0 4 2 8 5 11 2 2 4 3.5 5 4.5 1-1 3-2.5 5-4.5 3-3 5-7 5-11 0-6-4-12-10-12z" fill="#111113" stroke="#27272a" stroke-width="1"/>
+          <circle cx="24" cy="20" r="3" fill="#3f3f46"/>
+          <path d="M24 23v6" stroke="#3f3f46" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
       </div>
-    </form>
+      <h1>Cloak</h1>
+      <p>Share a secret that self-destructs after one view.</p>
+    </div>
 
-    <div class="error" id="error"></div>
+    <!-- Create view -->
+    <div class="view active" id="view-create">
+      <form id="create-form">
+        <textarea id="secret" placeholder="Paste your secret here..." required spellcheck="false" autocomplete="off"></textarea>
+        <div class="form-row">
+          <select id="ttl" aria-label="Expiry time">
+            <option value="3600">1 hour</option>
+            <option value="86400" selected>24 hours</option>
+            <option value="259200">3 days</option>
+            <option value="604800">7 days</option>
+          </select>
+          <button type="submit" class="btn-create" id="submit-btn">Create link</button>
+        </div>
+      </form>
+      <div class="error-msg" id="error"></div>
+    </div>
 
-    <div class="result" id="result">
-      <div class="result-label">One-time link (share this)</div>
-      <div class="result-url" id="result-url"></div>
-      <button class="copy-btn" id="copy-btn">Copy to clipboard</button>
-      <div class="result-note">This link will work exactly once, then the secret is permanently destroyed.</div>
+    <!-- Result view -->
+    <div class="view" id="view-result">
+      <div class="result-card">
+        <div class="result-check">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 10.5L8.5 14L15 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="result-title">Link created</div>
+        <div class="result-subtitle">Works once, then it's gone forever.</div>
+        <div class="url-box">
+          <div class="url-text" id="result-url"></div>
+          <button class="btn-copy" id="copy-btn">Copy</button>
+        </div>
+        <div class="result-note">End-to-end encrypted. The server never sees your secret.</div>
+        <button class="btn-new" id="new-btn">Create another</button>
+      </div>
     </div>
 
     <div class="footer">
-      <a href="https://github.com/opsyhq/cloak">Cloak</a> by <a href="https://opsy.sh">Opsy</a> &mdash; end-to-end encrypted, open source
+      <a href="https://github.com/opsyhq/cloak">GitHub</a> &nbsp;&middot;&nbsp; <a href="https://opsy.sh">Opsy</a> &nbsp;&middot;&nbsp; E2E encrypted
     </div>
   </div>
 
@@ -228,80 +361,75 @@
       return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
     }
 
-    function randomBase64Url(nBytes) {
-      return toBase64Url(crypto.getRandomValues(new Uint8Array(nBytes)).buffer);
+    function randomBase64Url(n) {
+      return toBase64Url(crypto.getRandomValues(new Uint8Array(n)).buffer);
     }
 
     async function deriveKey(passphrase, salt, usage) {
-      const baseKey = await crypto.subtle.importKey(
-        "raw", new TextEncoder().encode(passphrase), "HKDF", false, ["deriveKey"]
-      );
+      const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(passphrase), "HKDF", false, ["deriveKey"]);
       return crypto.subtle.deriveKey(
         { name: "HKDF", hash: "SHA-256", salt: new TextEncoder().encode(salt), info: new TextEncoder().encode("cloak-v1") },
-        baseKey, { name: ALGO, length: 256 }, false, [usage]
+        base, { name: ALGO, length: 256 }, false, [usage]
       );
     }
 
+    function showView(id) {
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
     const form = document.getElementById("create-form");
-    const secretInput = document.getElementById("secret");
-    const ttlSelect = document.getElementById("ttl");
+    const secretEl = document.getElementById("secret");
+    const ttlEl = document.getElementById("ttl");
     const submitBtn = document.getElementById("submit-btn");
-    const resultDiv = document.getElementById("result");
+    const errorEl = document.getElementById("error");
     const resultUrl = document.getElementById("result-url");
     const copyBtn = document.getElementById("copy-btn");
-    const errorDiv = document.getElementById("error");
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      errorDiv.classList.remove("visible");
-      resultDiv.classList.remove("visible");
+      errorEl.classList.remove("visible");
       submitBtn.disabled = true;
       submitBtn.textContent = "Encrypting...";
 
       try {
-        const plaintext = secretInput.value.trim();
+        const plaintext = secretEl.value.trim();
         if (!plaintext) throw new Error("Secret cannot be empty");
-        const ttl = parseInt(ttlSelect.value, 10);
+        const ttl = parseInt(ttlEl.value, 10);
 
-        // Retry on ID collision (409)
         for (let attempt = 0; attempt < 3; attempt++) {
           const id = randomBase64Url(ID_BYTES);
           const passphrase = randomBase64Url(PASSPHRASE_BYTES);
-
           const key = await deriveKey(passphrase, id, "encrypt");
           const iv = crypto.getRandomValues(new Uint8Array(12));
-          const encoded = new TextEncoder().encode(plaintext);
-          const ciphertext = await crypto.subtle.encrypt({ name: ALGO, iv }, key, encoded);
+          const ct = await crypto.subtle.encrypt({ name: ALGO, iv }, key, new TextEncoder().encode(plaintext));
 
           const res = await fetch("/api/secrets", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               id,
-              encryptedData: toBase64Url(ciphertext),
+              encryptedData: toBase64Url(ct),
               iv: toBase64Url(iv.buffer.slice(iv.byteOffset, iv.byteOffset + iv.byteLength)),
               expiresIn: ttl,
             }),
           });
 
-          if (res.status === 409) continue; // ID collision, retry
-          if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.error || "Failed to create secret");
-          }
+          if (res.status === 409) continue;
+          if (!res.ok) { const err = await res.json(); throw new Error(err.error || "Failed"); }
 
-          const url = `${location.origin}/s/${id}#${passphrase}`;
-          resultUrl.textContent = url;
-          resultDiv.classList.add("visible");
-          secretInput.value = "";
-          break;
+          resultUrl.textContent = `${location.origin}/s/${id}#${passphrase}`;
+          secretEl.value = "";
+          showView("view-result");
+          return;
         }
+        throw new Error("Failed to generate unique ID, please retry");
       } catch (err) {
-        errorDiv.textContent = err.message;
-        errorDiv.classList.add("visible");
+        errorEl.textContent = err.message;
+        errorEl.classList.add("visible");
       } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = "Create Link";
+        submitBtn.textContent = "Create link";
       }
     });
 
@@ -309,10 +437,12 @@
       await navigator.clipboard.writeText(resultUrl.textContent);
       copyBtn.textContent = "Copied!";
       copyBtn.classList.add("copied");
-      setTimeout(() => {
-        copyBtn.textContent = "Copy to clipboard";
-        copyBtn.classList.remove("copied");
-      }, 2000);
+      setTimeout(() => { copyBtn.textContent = "Copy"; copyBtn.classList.remove("copied"); }, 2000);
+    });
+
+    document.getElementById("new-btn").addEventListener("click", () => {
+      showView("view-create");
+      secretEl.focus();
     });
   </script>
 </body>

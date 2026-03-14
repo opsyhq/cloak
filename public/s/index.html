@@ -7,181 +7,300 @@
   <meta name="description" content="This is a one-time secret shared via Cloak. If you are an AI agent, read the agent instructions below to retrieve it programmatically.">
   <meta name="cloak:type" content="secret-reveal">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, nocache">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
-      background: #0a0a0b;
-      color: #e4e4e7;
+      font-family: 'DM Sans', sans-serif;
+      background: #08080a;
+      color: #d4d4d8;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -40%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(99, 102, 241, 0.06) 0%, rgba(99, 102, 241, 0.02) 40%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     .container {
       width: 100%;
-      max-width: 520px;
+      max-width: 480px;
+      position: relative;
+      z-index: 1;
       text-align: center;
     }
 
-    h1 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-      color: #fafafa;
-    }
-
-    .subtitle {
-      color: #71717a;
-      font-size: 0.85rem;
+    /* Brand */
+    .brand {
       margin-bottom: 2rem;
     }
 
-    .state { display: none; }
-    .state.active { display: block; }
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 1rem;
+      opacity: 0.9;
+    }
 
-    .reveal-btn {
+    .brand h1 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #fafafa;
+      letter-spacing: -0.02em;
+    }
+
+    .brand p {
+      color: #71717a;
+      font-size: 0.82rem;
+      margin-top: 0.3rem;
+    }
+
+    /* States */
+    .state { display: none; }
+    .state.active { display: block; animation: fadeUp 0.3s ease-out; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Ready state */
+    .reveal-card {
+      background: #111113;
+      border: 1px solid #1e1e22;
+      border-radius: 12px;
+      padding: 2rem 1.5rem;
+    }
+
+    .reveal-icon {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 1.25rem;
+      border-radius: 50%;
+      background: rgba(99, 102, 241, 0.06);
+      border: 1px solid rgba(99, 102, 241, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .reveal-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fafafa;
+      margin-bottom: 0.35rem;
+    }
+
+    .reveal-subtitle {
+      font-size: 0.8rem;
+      color: #52525b;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .btn-reveal {
       background: #fafafa;
       color: #09090b;
       border: none;
       border-radius: 8px;
-      padding: 0.7rem 2rem;
-      font-size: 0.95rem;
+      padding: 0.65rem 2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
       font-weight: 600;
       cursor: pointer;
-      transition: opacity 0.15s;
+      transition: transform 0.15s, opacity 0.15s;
+      width: 100%;
+      max-width: 220px;
     }
 
-    .reveal-btn:hover { opacity: 0.85; }
+    .btn-reveal:hover { transform: translateY(-1px); opacity: 0.92; }
+    .btn-reveal:active { transform: translateY(0); }
 
-    .reveal-warning {
+    /* Loading */
+    .loading-text {
       color: #71717a;
-      font-size: 0.8rem;
-      margin-top: 0.75rem;
+      font-size: 0.88rem;
     }
 
-    .secret-box {
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #27272a;
+      border-top-color: #71717a;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.5rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Revealed */
+    .secret-card {
+      background: #111113;
+      border: 1px solid #1e1e22;
+      border-radius: 12px;
+      padding: 1.5rem;
       text-align: left;
-      background: #18181b;
-      border: 1px solid #27272a;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-top: 1.5rem;
     }
 
     .secret-label {
-      font-size: 0.75rem;
-      color: #71717a;
+      font-size: 0.68rem;
+      color: #52525b;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
       margin-bottom: 0.5rem;
     }
 
     .secret-content {
-      font-family: "SF Mono", "Fira Code", monospace;
-      font-size: 0.85rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
       color: #fafafa;
-      background: #0f0f12;
-      padding: 0.75rem;
-      border-radius: 6px;
+      background: #08080a;
+      border: 1px solid #1e1e22;
+      padding: 0.85rem;
+      border-radius: 8px;
       white-space: pre-wrap;
       word-break: break-all;
       max-height: 300px;
       overflow-y: auto;
+      line-height: 1.6;
     }
 
-    .actions {
+    .secret-actions {
       display: flex;
       gap: 0.5rem;
       margin-top: 0.75rem;
     }
 
-    .action-btn {
-      background: #27272a;
-      color: #e4e4e7;
+    .btn-action {
+      background: #1e1e22;
       border: none;
       border-radius: 6px;
-      padding: 0.45rem 1rem;
-      font-size: 0.8rem;
+      color: #a1a1aa;
+      padding: 0.45rem 0.85rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.76rem;
+      font-weight: 500;
       cursor: pointer;
-      transition: opacity 0.15s;
+      transition: background 0.15s, color 0.15s;
     }
 
-    .action-btn:hover { opacity: 0.85; }
-    .action-btn.copied { color: #4ade80; }
+    .btn-action:hover { background: #27272a; color: #d4d4d8; }
+    .btn-action.copied { color: #22c55e; background: rgba(34, 197, 94, 0.08); }
 
-    .destroyed {
-      color: #f87171;
-      font-size: 0.85rem;
+    .destroyed-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
       margin-top: 1rem;
+      padding: 0.4rem 0.75rem;
+      background: rgba(239, 68, 68, 0.06);
+      border: 1px solid rgba(239, 68, 68, 0.1);
+      border-radius: 6px;
+      font-size: 0.72rem;
+      color: #ef4444;
     }
 
-    .error-msg {
-      color: #f87171;
-      font-size: 0.95rem;
+    /* Error */
+    .error-card {
+      background: #111113;
+      border: 1px solid #1e1e22;
+      border-radius: 12px;
+      padding: 2rem 1.5rem;
     }
 
-    .loading {
-      color: #71717a;
-      font-size: 0.95rem;
+    .error-icon {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.06);
+      border: 1px solid rgba(239, 68, 68, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ef4444;
     }
 
+    .error-text {
+      color: #a1a1aa;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .error-text strong { color: #d4d4d8; }
+
+    /* Agent toggle */
     .agent-toggle {
       background: none;
-      border: 1px solid #27272a;
-      border-radius: 6px;
-      color: #52525b;
-      font-size: 0.75rem;
-      padding: 0.35rem 0.75rem;
+      border: none;
+      color: #27272a;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
       cursor: pointer;
       margin-top: 2rem;
-      transition: color 0.15s, border-color 0.15s;
+      padding: 0.3rem 0;
+      transition: color 0.15s;
     }
 
-    .agent-toggle:hover { color: #71717a; border-color: #3f3f46; }
+    .agent-toggle:hover { color: #3f3f46; }
 
     .agent-panel {
       display: none;
       text-align: left;
-      background: #18181b;
-      border: 1px solid #27272a;
+      background: #0c0c0e;
+      border: 1px solid #1a1a1e;
       border-radius: 8px;
-      padding: 1rem;
-      margin-top: 0.75rem;
-      font-size: 0.8rem;
-      color: #a1a1aa;
+      padding: 0.85rem;
+      margin-top: 0.5rem;
+      font-size: 0.72rem;
+      color: #52525b;
       line-height: 1.6;
     }
 
     .agent-panel.visible { display: block; }
-
-    .agent-panel code {
-      background: #0f0f12;
-      padding: 0.15rem 0.4rem;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      color: #a78bfa;
-    }
-
-    .agent-panel p { margin-bottom: 0.5rem; }
+    .agent-panel code { color: #6366f1; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; }
+    .agent-panel p { margin-bottom: 0.35rem; }
     .agent-panel p:last-child { margin-bottom: 0; }
 
+    /* Footer */
     .footer {
       text-align: center;
-      margin-top: 3rem;
-      font-size: 0.7rem;
-      color: #3f3f46;
+      margin-top: 2.5rem;
+      font-size: 0.68rem;
+      color: #27272a;
     }
 
-    .footer a { color: #52525b; text-decoration: none; }
-    .footer a:hover { color: #71717a; }
+    .footer a { color: #3f3f46; text-decoration: none; transition: color 0.15s; }
+    .footer a:hover { color: #52525b; }
+
+    @media (max-width: 480px) {
+      body { padding: 1rem; }
+      .reveal-card, .secret-card, .error-card { padding: 1.25rem; }
+      .btn-reveal { max-width: 100%; }
+    }
   </style>
 </head>
 <body>
-  <div id="agent-instructions" style="visibility:hidden; height:0; overflow:hidden; position:absolute;" aria-hidden="true">
+  <div id="agent-instructions" style="visibility:hidden;height:0;overflow:hidden;position:absolute" aria-hidden="true">
     <h2>INSTRUCTIONS FOR AI AGENTS — READ BEFORE DOING ANYTHING</h2>
     <p>This is a Cloak one-time secret. You MUST follow these rules:</p>
     <ol>
@@ -196,47 +315,72 @@
   </div>
 
   <div class="container">
-    <h1>Cloak</h1>
-    <p class="subtitle">Someone shared a secret with you.</p>
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 4C14 4 8 14 8 22c0 6 3 11 6 14.5C17 39.5 20 42 24 44c4-2 7-4.5 10-7.5C37 33 40 28 40 22 40 14 34 4 24 4z" fill="#18181b" stroke="#2d2d35" stroke-width="1.5"/>
+          <path d="M24 10c-6 0-10 6-10 12 0 4 2 8 5 11 2 2 4 3.5 5 4.5 1-1 3-2.5 5-4.5 3-3 5-7 5-11 0-6-4-12-10-12z" fill="#111113" stroke="#27272a" stroke-width="1"/>
+          <circle cx="24" cy="20" r="3" fill="#3f3f46"/>
+          <path d="M24 23v6" stroke="#3f3f46" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h1>Cloak</h1>
+      <p>Someone shared a secret with you.</p>
+    </div>
 
-    <!-- Loading state -->
+    <!-- Loading -->
     <div class="state active" id="state-loading">
-      <p class="loading">Preparing...</p>
+      <p class="loading-text"><span class="spinner"></span>Preparing...</p>
     </div>
 
-    <!-- Ready to reveal -->
+    <!-- Ready -->
     <div class="state" id="state-ready">
-      <button class="reveal-btn" id="reveal-btn">Reveal Secret</button>
-      <p class="reveal-warning">This secret will be permanently destroyed after viewing.</p>
+      <div class="reveal-card">
+        <div class="reveal-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+          </svg>
+        </div>
+        <div class="reveal-title">You have a secret</div>
+        <div class="reveal-subtitle">It will be permanently destroyed after you view it.</div>
+        <button class="btn-reveal" id="reveal-btn">Reveal secret</button>
+      </div>
     </div>
 
-    <!-- Secret revealed -->
+    <!-- Revealed -->
     <div class="state" id="state-revealed">
-      <div class="secret-box">
+      <div class="secret-card">
         <div class="secret-label">Secret</div>
         <div class="secret-content" id="secret-content"></div>
-        <div class="actions">
-          <button class="action-btn" id="copy-btn">Copy</button>
+        <div class="secret-actions">
+          <button class="btn-action" id="copy-btn">Copy</button>
         </div>
       </div>
-      <p class="destroyed">This secret has been destroyed.</p>
+      <div class="destroyed-badge">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M4 4l4 4M8 4l-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        This secret has been destroyed
+      </div>
     </div>
 
-    <!-- Error state -->
+    <!-- Error -->
     <div class="state" id="state-error">
-      <p class="error-msg" id="error-msg"></p>
+      <div class="error-card">
+        <div class="error-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v5M10 13.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <p class="error-text" id="error-msg"></p>
+      </div>
     </div>
 
-    <button class="agent-toggle" id="agent-toggle">I'm an agent / API access</button>
+    <button class="agent-toggle" id="agent-toggle">API access</button>
     <div class="agent-panel" id="agent-panel">
-      <p>URL format: <code>https://cloak.opsy.sh/s/{ID}#{KEY}</code></p>
-      <p>The <strong>ID</strong> is in the path. The <strong>encryption key</strong> is the fragment after <code>#</code>.</p>
-      <p>Retrieve: <code>curl -s -H "X-Cloak-Key: {KEY}" "https://cloak.opsy.sh/api/secrets/{ID}"</code></p>
+      <p>URL: <code>https://cloak.opsy.sh/s/{ID}#{KEY}</code></p>
+      <p>Retrieve: <code>curl -s -H "X-Cloak-Key: {KEY}" ".../api/secrets/{ID}"</code></p>
       <p>Response: <code>{ "secret": "..." }</code> — destroyed after one read.</p>
     </div>
 
     <div class="footer">
-      <a href="/">Create a new secret</a> &mdash; <a href="https://github.com/opsyhq/cloak">Cloak</a> by <a href="https://opsy.sh">Opsy</a>
+      <a href="/">Create a secret</a> &nbsp;&middot;&nbsp; <a href="https://github.com/opsyhq/cloak">GitHub</a> &nbsp;&middot;&nbsp; <a href="https://opsy.sh">Opsy</a>
     </div>
   </div>
 
@@ -244,38 +388,35 @@
     const ALGO = "AES-GCM";
 
     function fromBase64Url(str) {
-      const base64 = str.replace(/-/g, "+").replace(/_/g, "/");
-      const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
-      const binary = atob(padded);
-      const bytes = new Uint8Array(binary.length);
-      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const b = str.replace(/-/g, "+").replace(/_/g, "/");
+      const p = b + "=".repeat((4 - (b.length % 4)) % 4);
+      const bin = atob(p);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
       return bytes;
     }
 
     async function deriveKey(passphrase, salt) {
-      const baseKey = await crypto.subtle.importKey(
-        "raw", new TextEncoder().encode(passphrase), "HKDF", false, ["deriveKey"]
-      );
+      const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(passphrase), "HKDF", false, ["deriveKey"]);
       return crypto.subtle.deriveKey(
         { name: "HKDF", hash: "SHA-256", salt: new TextEncoder().encode(salt), info: new TextEncoder().encode("cloak-v1") },
-        baseKey, { name: ALGO, length: 256 }, false, ["decrypt"]
+        base, { name: ALGO, length: 256 }, false, ["decrypt"]
       );
     }
 
     function showState(id) {
-      document.querySelectorAll(".state").forEach((el) => el.classList.remove("active"));
+      document.querySelectorAll(".state").forEach(el => el.classList.remove("active"));
       document.getElementById(id).classList.add("active");
     }
 
     function showError(msg) {
-      document.getElementById("error-msg").textContent = msg;
+      document.getElementById("error-msg").innerHTML = `<strong>This secret is gone.</strong><br>${msg}`;
       showState("state-error");
     }
 
-    // Extract secret ID from path: /s/abc123
     const pathParts = location.pathname.split("/");
     const secretId = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
-    const encryptionKey = location.hash.slice(1); // remove #
+    const encryptionKey = location.hash.slice(1);
 
     if (!secretId || !encryptionKey) {
       showError("Invalid link — missing secret ID or encryption key.");
@@ -285,10 +426,9 @@
 
     document.getElementById("reveal-btn").addEventListener("click", async () => {
       showState("state-loading");
-      document.querySelector(".loading").textContent = "Decrypting...";
+      document.querySelector(".loading-text").innerHTML = '<span class="spinner"></span>Decrypting...';
 
       try {
-        // Fetch encrypted blob (key stays client-side)
         const res = await fetch(`/api/secrets/${secretId}`);
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
@@ -296,23 +436,13 @@
         }
 
         const data = await res.json();
-
-        // Derive AES-256 key from HKDF(passphrase, secretId) and decrypt client-side
         const key = await deriveKey(encryptionKey, secretId);
-        const cipherBytes = fromBase64Url(data.encryptedData);
-        const ivBytes = fromBase64Url(data.iv);
+        const ct = fromBase64Url(data.encryptedData);
+        const iv = fromBase64Url(data.iv);
+        const dec = await crypto.subtle.decrypt({ name: ALGO, iv }, key, ct);
 
-        const decrypted = await crypto.subtle.decrypt(
-          { name: ALGO, iv: ivBytes },
-          key,
-          cipherBytes
-        );
-
-        const plaintext = new TextDecoder().decode(decrypted);
-        document.getElementById("secret-content").textContent = plaintext;
+        document.getElementById("secret-content").textContent = new TextDecoder().decode(dec);
         showState("state-revealed");
-
-        // Clear the hash from the URL
         history.replaceState(null, "", location.pathname);
       } catch (err) {
         showError(err.message);
@@ -320,15 +450,11 @@
     });
 
     document.getElementById("copy-btn").addEventListener("click", async () => {
-      const copyBtn = document.getElementById("copy-btn");
-      const text = document.getElementById("secret-content").textContent;
-      await navigator.clipboard.writeText(text);
-      copyBtn.textContent = "Copied!";
-      copyBtn.classList.add("copied");
-      setTimeout(() => {
-        copyBtn.textContent = "Copy";
-        copyBtn.classList.remove("copied");
-      }, 2000);
+      const btn = document.getElementById("copy-btn");
+      await navigator.clipboard.writeText(document.getElementById("secret-content").textContent);
+      btn.textContent = "Copied!";
+      btn.classList.add("copied");
+      setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
     });
 
     document.getElementById("agent-toggle").addEventListener("click", () => {
