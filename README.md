@@ -1,115 +1,127 @@
-# Cloak
+<p align="center">
+  <h1 align="center">Cloak</h1>
+  <p align="center"><strong>One-time secret sharing for humans & agents.</strong></p>
+  <p align="center">
+    AES-256-GCM encrypted, zero-knowledge in the browser,<br/>
+    self-destructing after one read.
+  </p>
+</p>
 
-One-time secret sharing for humans and agents. AES-256-GCM encrypted, zero-knowledge in the browser, open source.
+<p align="center">
+  <a href="https://www.npmjs.com/package/@opsyhq/cloak"><img src="https://img.shields.io/npm/v/@opsyhq/cloak" alt="npm version"></a>
+  <a href="https://github.com/opsyhq/cloak/blob/main/LICENSE"><img src="https://img.shields.io/github/license/opsyhq/cloak" alt="license"></a>
+  <a href="https://github.com/opsyhq/cloak/actions/workflows/deploy.yml"><img src="https://github.com/opsyhq/cloak/actions/workflows/deploy.yml/badge.svg" alt="deploy"></a>
+</p>
 
-**[cloak.opsy.sh](https://cloak.opsy.sh)**
+<p align="center">
+  <a href="https://cloak.opsy.sh">Live App</a> ·
+  <a href="#quickstart">Quickstart</a> ·
+  <a href="#api">API</a> ·
+  <a href="#cli">CLI</a> ·
+  <a href="#for-ai-agents">For AI Agents</a> ·
+  <a href="#self-hosting">Self-Hosting</a>
+</p>
 
 ---
 
-## The Problem
+You need to send someone an API key, database password, or token. You can't put it in Slack, email, or a terminal log — it'll live there forever.
 
-You need to send someone an API key, database password, or token. You can't put it in Slack, email, or a terminal log — it'll live there forever. You need a link that works once and then self-destructs.
-
-## How It Works
+**Cloak creates encrypted, self-destructing secret links.** Share the link. It works once. Then the secret is permanently destroyed.
 
 ```
 https://cloak.opsy.sh/s/W9ZEykcG#8g9I3UUBjH3x4kdL
                        ^^^^^^^^ ^^^^^^^^^^^^^^^^
-                       ID        encryption key (never sent to server)
+                       ID        key (never sent to server)
 ```
 
-1. **Create** — encrypt a secret, get a short URL
-2. **Share** — send the URL to the recipient (the key is in the `#fragment`, never sent to the server)
-3. **Open** — recipient opens the URL, secret is decrypted and permanently destroyed
+> **Zero-knowledge in the browser.** The encryption key stays in the URL fragment — browsers never send it to the server. The server only stores an encrypted blob it can't read.
 
-The browser flow is **zero-knowledge**: the server only stores an encrypted blob and never sees the plaintext or the key. The key stays in the URL fragment, which browsers never send to the server.
-
----
-
-## Usage
+## Quickstart
 
 ### Browser
 
-Go to [cloak.opsy.sh](https://cloak.opsy.sh). Paste your secret. Get a link. Share it.
+Open [cloak.opsy.sh](https://cloak.opsy.sh). Paste your secret. Get a link. Share it.
 
-### curl / API
+### curl
 
-**Create a secret:**
 ```bash
+# Create — secret from env var, never touches shell history
 curl -s -X POST https://cloak.opsy.sh/api/secrets \
   -H "Content-Type: application/json" \
   -d "{\"secret\":\"$MY_SECRET\"}"
-```
+# → {"id":"W9ZEykcG","key":"8g9I3UUBjH3x4kdL","url":"https://cloak.opsy.sh/s/W9ZEykcG#8g9I3UUBjH3x4kdL"}
 
-Response:
-```json
-{
-  "id": "W9ZEykcG",
-  "key": "8g9I3UUBjH3x4kdL",
-  "url": "https://cloak.opsy.sh/s/W9ZEykcG#8g9I3UUBjH3x4kdL",
-  "expiresAt": 1710000000
-}
-```
-
-**Retrieve a secret** (use the `X-Cloak-Key` header):
-```bash
-curl -s -H "X-Cloak-Key: 8g9I3UUBjH3x4kdL" \
-  "https://cloak.opsy.sh/api/secrets/W9ZEykcG"
-```
-
-Response:
-```json
-{ "secret": "the-plaintext-value" }
-```
-
-The secret is destroyed after this request. A second request returns 404.
-
-**Pipe directly to an env var** (secret never appears in terminal):
-```bash
-export DB_PASSWORD=$(curl -s -H "X-Cloak-Key: KEY" \
-  "https://cloak.opsy.sh/api/secrets/ID" | jq -r .secret)
+# Retrieve — straight to env var, never printed
+export MY_SECRET=$(curl -s -H "X-Cloak-Key: 8g9I3UUBjH3x4kdL" \
+  "https://cloak.opsy.sh/api/secrets/W9ZEykcG" | jq -r .secret)
 ```
 
 ### CLI
 
 ```bash
 # Create (reads from stdin)
-echo "$SECRET" | bunx @opsy/cloak create
-echo "$SECRET" | bunx @opsy/cloak create --ttl 1h
+echo "$SECRET" | npx @opsyhq/cloak create
+echo "$SECRET" | npx @opsyhq/cloak create --ttl 1h
 
 # Retrieve
-bunx @opsy/cloak get "https://cloak.opsy.sh/s/ID#KEY"
+npx @opsyhq/cloak get "https://cloak.opsy.sh/s/W9ZEykcG#8g9I3UUBjH3x4kdL"
 
 # Retrieve as export statement
-bunx @opsy/cloak get "https://cloak.opsy.sh/s/ID#KEY" --env
+npx @opsyhq/cloak get "https://cloak.opsy.sh/s/W9ZEykcG#8g9I3UUBjH3x4kdL" --env
 # → export SECRET='the-value'
 ```
 
----
+## How It Works
 
-## API Reference
+```
+Browser (zero-knowledge)              Server (Hono + CF Workers)         D1
+  │                                      │                               │
+  ├─ generate ID + passphrase            │                               │
+  ├─ HKDF(passphrase, ID) → AES key     │                               │
+  ├─ AES-256-GCM encrypt                │                               │
+  ├─ POST {id, encryptedData, iv} ─────→ store blob ───────────────────→ │
+  │                                      │                               │
+  ├─ GET /api/secrets/:id ─────────────→ atomic delete + return blob ──→ │
+  ├─ HKDF(passphrase, ID) → AES key     │                               │
+  ├─ AES-256-GCM decrypt                │                               │
+  └─ display secret                      │                               │
+
+curl / Agent (server-assisted)
+  │                                      │                               │
+  ├─ POST {secret} ───────────────────→  generate ID + passphrase        │
+  │                                      HKDF → encrypt → store ───────→ │
+  │ ← {id, key, url} ──────────────────                                  │
+  │                                      │                               │
+  ├─ GET /api/secrets/:id ─────────────→ atomic delete + decrypt ──────→ │
+  │  X-Cloak-Key: passphrase            │                               │
+  │ ← {secret} ────────────────────────                                  │
+```
+
+**Browser flow** — true zero-knowledge. The server never sees the plaintext or the encryption key.
+
+**curl/agent flow** — server assists with encryption. Plaintext is sent over TLS and processed transiently, never stored. For true zero-knowledge from the terminal, use the CLI with client-side encryption.
+
+## API
 
 ### `POST /api/secrets`
 
 Create a secret. Two modes:
 
-**Server-encrypt (curl/agent)** — send plaintext, server encrypts:
+<details open>
+<summary><strong>Server-encrypt (curl/agent)</strong></summary>
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `secret` | string | yes | The secret to share (max 10,000 chars) |
-| `expiresIn` | number | no | TTL in seconds (default: 86400, min: 60, max: 604800) |
+```bash
+curl -s -X POST https://cloak.opsy.sh/api/secrets \
+  -H "Content-Type: application/json" \
+  -d '{"secret":"sk-abc123", "expiresIn": 3600}'
+```
 
-**Client-encrypt (browser, zero-knowledge)** — send pre-encrypted blob:
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `secret` | string | required | The secret (max 10,000 chars) |
+| `expiresIn` | number | 86400 | TTL in seconds (min 60, max 604800) |
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | string | yes | Client-generated ID (6-16 alphanumeric chars) |
-| `encryptedData` | string | yes | Base64url-encoded ciphertext |
-| `iv` | string | yes | Base64url-encoded IV |
-| `expiresIn` | number | no | TTL in seconds |
-
-**Response (server-encrypt):**
+Response:
 ```json
 {
   "id": "W9ZEykcG",
@@ -118,77 +130,94 @@ Create a secret. Two modes:
   "expiresAt": 1710000000
 }
 ```
+</details>
 
-**Response (client-encrypt):**
-```json
-{
-  "id": "W9ZEykcG",
-  "expiresAt": 1710000000
-}
+<details>
+<summary><strong>Client-encrypt (browser, zero-knowledge)</strong></summary>
+
+```bash
+curl -s -X POST https://cloak.opsy.sh/api/secrets \
+  -H "Content-Type: application/json" \
+  -d '{"id":"AbCdEfGh", "encryptedData":"base64url...", "iv":"base64url...", "expiresIn": 3600}'
 ```
 
-Returns `409` on ID collision (client should retry with a new ID).
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | string | required | Client-generated ID (6-16 alphanumeric) |
+| `encryptedData` | string | required | Base64url ciphertext |
+| `iv` | string | required | Base64url IV |
+| `expiresIn` | number | 86400 | TTL in seconds |
 
----
+Response: `{ "id": "AbCdEfGh", "expiresAt": 1710000000 }`
+
+Returns `409` on ID collision — retry with a new ID.
+</details>
 
 ### `GET /api/secrets/:id`
 
-Retrieve and destroy a secret. Two modes:
+Retrieve and destroy a secret.
 
-**Server-decrypt (curl/agent)** — send the key, get plaintext back:
-```
-GET /api/secrets/W9ZEykcG
-X-Cloak-Key: 8g9I3UUBjH3x4kdL
-```
-
-Response: `{ "secret": "the-plaintext-value" }`
-
-**Client-decrypt (browser, zero-knowledge)** — omit the key, get the encrypted blob:
-```
-GET /api/secrets/W9ZEykcG
+**With key (server decrypts):**
+```bash
+curl -s -H "X-Cloak-Key: 8g9I3UUBjH3x4kdL" \
+  "https://cloak.opsy.sh/api/secrets/W9ZEykcG"
+# → {"secret":"sk-abc123"}
 ```
 
-Response: `{ "encryptedData": "...", "iv": "..." }`
+**Without key (returns encrypted blob for client-side decryption):**
+```bash
+curl -s "https://cloak.opsy.sh/api/secrets/W9ZEykcG"
+# → {"encryptedData":"...","iv":"..."}
+```
 
-In both modes, the secret is atomically deleted upon retrieval. Returns `404` if not found, expired, or already read. Returns `403` if the key is wrong.
-
----
+The secret is atomically deleted upon retrieval. Returns `404` if not found, expired, or already read. Returns `403` if the key is wrong.
 
 ### `DELETE /api/secrets/:id`
 
-Destroy a secret without reading it. Requires the key for authorization.
+Destroy a secret without reading it. Requires the key.
 
+```bash
+curl -s -X DELETE -H "X-Cloak-Key: 8g9I3UUBjH3x4kdL" \
+  "https://cloak.opsy.sh/api/secrets/W9ZEykcG"
+# → {"ok":true}
 ```
-DELETE /api/secrets/W9ZEykcG
-X-Cloak-Key: 8g9I3UUBjH3x4kdL
+
+## CLI
+
+```bash
+npx @opsyhq/cloak <command>
 ```
 
-Response: `{ "ok": true }`
+| Command | Description |
+|---------|-------------|
+| `create [--ttl 1h]` | Read secret from stdin, print URL |
+| `get <url>` | Retrieve secret, print to stdout |
+| `get <url> --env` | Print as `export SECRET='...'` |
 
----
+Set `CLOAK_URL` to use a self-hosted instance.
 
 ## For AI Agents
 
-When an agent receives a Cloak URL, it needs to:
+When an agent receives a Cloak URL:
 
-1. Parse the URL: ID is the path after `/s/`, key is the fragment after `#`
-2. Call the API with the key in the `X-Cloak-Key` header
-3. **Never display the secret value in conversation** — pipe it directly to a file, env var, or another command
-4. Confirm to the user that the secret was retrieved and stored, without showing the value
+1. **Parse the URL** — ID is the path after `/s/`, key is the fragment after `#`
+2. **Call the API** — `curl -s -H "X-Cloak-Key: KEY" "https://cloak.opsy.sh/api/secrets/ID"`
+3. **Never display the secret** — pipe it to a file, env var, or command. Never echo it in conversation.
 
-The Cloak reveal page embeds agent instructions in a hidden DOM element. Agents that fetch the page as HTML will find retrieval instructions. Agents can also request JSON instructions by fetching the `/s/:id` URL with `Accept: application/json`.
+The Cloak reveal page embeds agent instructions in a hidden DOM element and supports `Accept: application/json` content negotiation for structured retrieval instructions.
 
-### OpenClaw Skill
+<details>
+<summary><strong>OpenClaw / ClawHub</strong></summary>
 
-The `skill/SKILL.md` file teaches agents how to use Cloak via curl. It includes step-by-step instructions, security rules, and a quick reference table.
+**Skill** — published to [ClawHub](https://clawhub.ai) as `cloak`. Teaches agents to use the API via curl.
 
 ```bash
-openclaw skills publish skill/
+clawhub install cloak
 ```
 
-### OpenClaw Plugin
+**Plugin** — `plugin/` provides `cloak_create` and `cloak_get` as native agent tools.
 
-The `plugin/` directory provides `cloak_create` and `cloak_get` as native agent tools:
+**Secret Provider** — `cli/openclaw-resolver.ts` acts as an `exec` provider for injecting secrets into agent environments without them appearing in conversation.
 
 ```json
 {
@@ -198,48 +227,17 @@ The `plugin/` directory provides `cloak_create` and `cloak_get` as native agent 
   "passEnv": ["CLOAK_URL"]
 }
 ```
-
-### OpenClaw Secret Provider
-
-The `cli/openclaw-resolver.ts` acts as an `exec` secret provider. It reads Cloak references from stdin and resolves them to plaintext values, so secrets can be injected into agent environments without ever appearing in conversation.
-
-Input:
-```json
-{ "protocolVersion": 1, "provider": "cloak", "ids": ["W9ZEykcG#8g9I3UUBjH3x4kdL"] }
-```
-
-Output:
-```json
-{ "protocolVersion": 1, "values": { "W9ZEykcG#8g9I3UUBjH3x4kdL": "the-secret" } }
-```
-
----
+</details>
 
 ## Security
 
-### Encryption
-
-- **AES-256-GCM** symmetric encryption via the Web Crypto API
-- **HKDF-SHA256** key derivation: a short passphrase (96 bits) + the secret ID (as salt) derive the full 256-bit encryption key
-- **96-bit passphrase entropy**: not brute-forceable even if an attacker obtains the encrypted blob from the database
-
-### Zero-Knowledge (Browser Flow)
-
-The browser generates both the ID and passphrase locally, derives the AES key via HKDF, encrypts the secret client-side, and sends only the encrypted blob to the server. The passphrase stays in the URL fragment, which browsers never transmit. On reveal, the browser fetches the encrypted blob (without sending the key), derives the key locally, and decrypts in the browser. **The server never sees the plaintext or the encryption key.**
-
-### curl/Agent Flow
-
-When using curl or the CLI, the server handles encryption and decryption. The plaintext is sent over TLS and is never stored — only the encrypted blob persists. This is a documented tradeoff for convenience. For true zero-knowledge from the terminal, use the `cloak` CLI which can perform client-side encryption (same as the browser).
-
-### Other
-
-- **Atomic one-time read**: secrets are deleted in the same database operation that reads them — no race condition
-- **Authenticated delete**: the `DELETE` endpoint requires the encryption key, preventing unauthenticated destruction
-- **Auto-expiry**: expired secrets are cleaned up hourly via Cloudflare Cron Triggers
-- **CORS restricted**: API only accepts requests from the app's own origin
-- **No crawling**: `robots.txt` blocks `/s/` and `/api/`, `X-Robots-Tag` headers on all API responses, `noindex` meta tags on secret pages
-
----
+- **AES-256-GCM** with HKDF-SHA256 key derivation (96-bit passphrase entropy)
+- **Zero-knowledge browser flow** — server never sees plaintext or key
+- **Atomic one-time read** — `DELETE ... RETURNING` prevents race condition double-reads
+- **Authenticated delete** — requires the encryption key
+- **CORS restricted** — API only accepts requests from the app's origin
+- **No crawling** — `robots.txt`, `X-Robots-Tag` headers, `noindex` meta tags
+- **Auto-expiry** — hourly cleanup via Cloudflare Cron Triggers
 
 ## Self-Hosting
 
@@ -248,21 +246,21 @@ git clone https://github.com/opsyhq/cloak
 cd cloak
 bun install
 
-# Create the D1 database
-wrangler d1 create cloak-db
-# Copy the database_id into wrangler.toml
+# Create D1 database
+bunx wrangler d1 create cloak-db
+# Copy database_id into wrangler.toml
 
 # Apply schema
 bun run db:init
 
-# Local development
+# Dev
 bun run dev
 
-# Deploy to Cloudflare
+# Deploy
 bun run deploy
 ```
 
-Set `BASE_URL` in your wrangler.toml `[vars]` section if you're using a custom domain:
+Set your custom domain in `wrangler.toml`:
 ```toml
 [vars]
 BASE_URL = "https://secrets.yourdomain.com"
@@ -270,35 +268,6 @@ BASE_URL = "https://secrets.yourdomain.com"
 
 ---
 
-## Architecture
-
-```
-Browser (zero-knowledge)          API (Hono on CF Worker)         D1 (SQLite)
-  │                                  │                              │
-  ├─ generate ID + passphrase        │                              │
-  ├─ HKDF(passphrase, ID) → key     │                              │
-  ├─ AES-256-GCM encrypt            │                              │
-  ├─ POST {id, encryptedData, iv} ──→├─ store encrypted blob ──────→│
-  │                                  │                              │
-  ├─ GET /api/secrets/:id ──────────→├─ atomic delete + return blob→│
-  ├─ HKDF(passphrase, ID) → key     │                              │
-  ├─ AES-256-GCM decrypt            │                              │
-  └─ display secret                  │                              │
-
-curl/Agent (server-assisted)
-  │                                  │                              │
-  ├─ POST {secret} ────────────────→├─ generate ID + passphrase    │
-  │                                  ├─ HKDF(passphrase, ID) → key │
-  │                                  ├─ encrypt + store ───────────→│
-  │← {id, key, url} ────────────────┤                              │
-  │                                  │                              │
-  ├─ GET /api/secrets/:id ──────────→├─ atomic delete + decrypt ───→│
-  │  X-Cloak-Key: passphrase        │                              │
-  │← {secret} ──────────────────────┤                              │
-```
-
----
-
-## License
-
-MIT
+<p align="center">
+  Built by <a href="https://github.com/opsyhq"><strong>OpsyHQ</strong></a> · MIT License
+</p>
