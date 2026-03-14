@@ -79,17 +79,18 @@
     /* Agent panel */
     .agent-toggle {
       background: none;
-      border: none;
-      color: #27272a;
+      border: 1px solid #1e1e22;
+      border-radius: 6px;
+      color: #52525b;
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       cursor: pointer;
-      margin-top: 2rem;
-      padding: 0.3rem 0;
-      transition: color 0.15s;
+      margin-top: 1.5rem;
+      padding: 0.35rem 0.75rem;
+      transition: color 0.15s, border-color 0.15s;
     }
 
-    .agent-toggle:hover { color: #3f3f46; }
+    .agent-toggle:hover { color: #71717a; border-color: #2d2d35; }
 
     .agent-panel {
       display: none;
@@ -135,7 +136,7 @@
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.06);
     }
 
-    textarea::placeholder { color: #2d2d35; }
+    textarea::placeholder { color: #52525b; }
 
     .form-row {
       display: flex;
@@ -296,27 +297,59 @@
     .footer {
       text-align: center;
       margin-top: 3rem;
-      font-size: 0.68rem;
-      color: #27272a;
+      font-size: 0.72rem;
+      color: #3f3f46;
+      line-height: 1.8;
     }
 
     .footer a {
-      color: #3f3f46;
+      color: #52525b;
       text-decoration: none;
       transition: color 0.15s;
     }
 
-    .footer a:hover { color: #52525b; }
+    .footer a:hover { color: #71717a; }
+
+    /* Tablet */
+    @media (max-width: 768px) {
+      body { padding: 1.25rem; }
+      .brand { margin-bottom: 2rem; }
+      .brand-icon { width: 44px; height: 44px; }
+      .result-card { padding: 1.25rem; }
+    }
 
     /* Mobile */
     @media (max-width: 480px) {
-      body { padding: 1rem; }
+      body { padding: 1rem 0.85rem; }
       .container { max-width: 100%; }
-      textarea { min-height: 110px; font-size: 0.8rem; }
-      .form-row { flex-wrap: wrap; }
-      .btn-create { width: 100%; margin-left: 0; margin-top: 0.25rem; }
-      select { flex: 1; }
-      .url-text { font-size: 0.65rem; }
+      .brand { margin-bottom: 1.75rem; }
+      .brand-icon { width: 40px; height: 40px; margin-bottom: 0.75rem; }
+      .brand h1 { font-size: 1.2rem; }
+      .brand p { font-size: 0.78rem; }
+      textarea { min-height: 110px; font-size: 0.8rem; padding: 0.75rem; }
+      .form-row { flex-wrap: wrap; gap: 0.5rem; }
+      .btn-create { width: 100%; margin-left: 0; padding: 0.65rem; }
+      select { flex: 1; padding: 0.6rem 0.7rem; }
+      .result-card { padding: 1.15rem; }
+      .result-check { width: 36px; height: 36px; margin-bottom: 0.75rem; }
+      .result-title { font-size: 0.9rem; }
+      .url-text { font-size: 0.65rem; padding: 0.6rem 0.7rem; }
+      .btn-copy { padding: 0.6rem 0.85rem; font-size: 0.75rem; }
+      .btn-new { padding: 0.5rem 0.85rem; font-size: 0.75rem; }
+      .result-note { font-size: 0.68rem; }
+      .agent-toggle { margin-top: 1.5rem; }
+      .agent-panel { padding: 0.75rem; font-size: 0.68rem; }
+      .agent-panel code { font-size: 0.62rem; }
+      .footer { margin-top: 2rem; font-size: 0.65rem; }
+    }
+
+    /* Small phones */
+    @media (max-width: 360px) {
+      body { padding: 0.75rem; }
+      .brand-icon { width: 36px; height: 36px; }
+      .brand h1 { font-size: 1.1rem; }
+      textarea { min-height: 100px; font-size: 0.75rem; }
+      .url-text { font-size: 0.6rem; }
     }
   </style>
 </head>

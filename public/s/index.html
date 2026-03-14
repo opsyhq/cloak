@@ -251,17 +251,18 @@
     /* Agent toggle */
     .agent-toggle {
       background: none;
-      border: none;
-      color: #27272a;
+      border: 1px solid #1e1e22;
+      border-radius: 6px;
+      color: #52525b;
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       cursor: pointer;
-      margin-top: 2rem;
-      padding: 0.3rem 0;
-      transition: color 0.15s;
+      margin-top: 1.5rem;
+      padding: 0.35rem 0.75rem;
+      transition: color 0.15s, border-color 0.15s;
     }
 
-    .agent-toggle:hover { color: #3f3f46; }
+    .agent-toggle:hover { color: #71717a; border-color: #2d2d35; }
 
     .agent-panel {
       display: none;
@@ -285,17 +286,55 @@
     .footer {
       text-align: center;
       margin-top: 2.5rem;
-      font-size: 0.68rem;
-      color: #27272a;
+      font-size: 0.72rem;
+      color: #3f3f46;
+      line-height: 1.8;
     }
 
-    .footer a { color: #3f3f46; text-decoration: none; transition: color 0.15s; }
-    .footer a:hover { color: #52525b; }
+    .footer a { color: #52525b; text-decoration: none; transition: color 0.15s; }
+    .footer a:hover { color: #71717a; }
 
+    /* Tablet */
+    @media (max-width: 768px) {
+      body { padding: 1.25rem; }
+      .brand { margin-bottom: 1.75rem; }
+      .brand-icon { width: 44px; height: 44px; }
+      .reveal-card, .secret-card, .error-card { padding: 1.5rem; }
+    }
+
+    /* Mobile */
     @media (max-width: 480px) {
-      body { padding: 1rem; }
-      .reveal-card, .secret-card, .error-card { padding: 1.25rem; }
-      .btn-reveal { max-width: 100%; }
+      body { padding: 1rem 0.85rem; }
+      .container { max-width: 100%; }
+      .brand { margin-bottom: 1.5rem; }
+      .brand-icon { width: 40px; height: 40px; margin-bottom: 0.75rem; }
+      .brand h1 { font-size: 1.2rem; }
+      .brand p { font-size: 0.78rem; }
+      .reveal-card { padding: 1.5rem 1.15rem; }
+      .reveal-icon { width: 44px; height: 44px; margin-bottom: 1rem; }
+      .reveal-title { font-size: 0.92rem; }
+      .reveal-subtitle { font-size: 0.76rem; margin-bottom: 1.25rem; }
+      .btn-reveal { max-width: 100%; padding: 0.7rem; font-size: 0.85rem; }
+      .secret-card { padding: 1.15rem; }
+      .secret-content { font-size: 0.78rem; padding: 0.75rem; }
+      .btn-action { padding: 0.45rem 0.75rem; font-size: 0.73rem; }
+      .destroyed-badge { font-size: 0.68rem; padding: 0.35rem 0.65rem; }
+      .error-card { padding: 1.5rem 1.15rem; }
+      .error-icon { width: 40px; height: 40px; }
+      .error-text { font-size: 0.8rem; }
+      .agent-toggle { margin-top: 1.5rem; }
+      .agent-panel { padding: 0.75rem; font-size: 0.68rem; }
+      .agent-panel code { font-size: 0.62rem; }
+      .footer { margin-top: 2rem; font-size: 0.65rem; }
+    }
+
+    /* Small phones */
+    @media (max-width: 360px) {
+      body { padding: 0.75rem; }
+      .brand-icon { width: 36px; height: 36px; }
+      .brand h1 { font-size: 1.1rem; }
+      .reveal-card, .secret-card, .error-card { padding: 1rem; }
+      .secret-content { font-size: 0.72rem; }
     }
   </style>
 </head>
