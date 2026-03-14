@@ -154,6 +154,11 @@
       <p>Send secrets to and from AI agents.<br/>Encrypted. One-time. Self-destructing.</p>
     </div>
 
+    <div class="mode-toggle">
+      <button class="active" id="mode-human"><span class="mode-emoji">&#128100;</span> I'm a Human</button>
+      <button id="mode-agent"><span class="mode-emoji">&#129302;</span> I'm an Agent</button>
+    </div>
+
     <div class="view active" id="view-create">
       <form id="create-form">
         <textarea id="secret" placeholder="Paste your secret here..." required spellcheck="false" autocomplete="off"></textarea>
@@ -195,12 +200,13 @@
       </div>
     </div>
 
-    <button class="agent-toggle" id="agent-toggle">Are you an agent?</button>
-    <div class="agent-panel" id="agent-panel">
-      <p><strong>Create:</strong> <code>curl -s -X POST .../api/secrets -H "Content-Type: application/json" -d '{"secret":"..."}'</code></p>
-      <p><strong>Retrieve:</strong> <code>curl -s -H "X-Cloak-Key: KEY" ".../api/secrets/ID"</code></p>
-      <p><strong>Response:</strong> <code>{ "secret": "..." }</code> — destroyed after one read.</p>
-      <p><a href="https://github.com/opsyhq/cloak#api" style="color:#6366f1">Full API docs</a></p>
+    <div class="view" id="view-agent">
+      <div class="agent-panel">
+        <p><strong>Create:</strong> <code>curl -s -X POST .../api/secrets -H "Content-Type: application/json" -d '{"secret":"..."}'</code></p>
+        <p><strong>Retrieve:</strong> <code>curl -s -H "X-Cloak-Key: KEY" ".../api/secrets/ID"</code></p>
+        <p><strong>Response:</strong> <code>{ "secret": "..." }</code> — destroyed after one read.</p>
+        <p><a href="https://github.com/opsyhq/cloak#api" style="color:#6366f1">Full API docs</a></p>
+      </div>
     </div>
 
     <div class="footer">
@@ -311,8 +317,22 @@
       secretEl.focus();
     });
 
-    document.getElementById("agent-toggle").addEventListener("click", () => {
-      document.getElementById("agent-panel").classList.toggle("visible");
+    let lastHumanView = "view-create";
+
+    document.getElementById("mode-human").addEventListener("click", () => {
+      document.getElementById("mode-human").classList.add("active");
+      document.getElementById("mode-agent").classList.remove("active");
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.getElementById(lastHumanView).classList.add("active");
+    });
+
+    document.getElementById("mode-agent").addEventListener("click", () => {
+      const currentHuman = document.querySelector(".view.active:not(#view-agent)");
+      if (currentHuman) lastHumanView = currentHuman.id;
+      document.getElementById("mode-agent").classList.add("active");
+      document.getElementById("mode-human").classList.remove("active");
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.getElementById("view-agent").classList.add("active");
     });
 
     document.addEventListener("keydown", (e) => {

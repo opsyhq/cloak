@@ -145,6 +145,12 @@
       <p>Someone shared a secret with you.</p>
     </div>
 
+    <div class="mode-toggle">
+      <button class="active" id="mode-human"><span class="mode-emoji">&#128100;</span> I'm a Human</button>
+      <button id="mode-agent"><span class="mode-emoji">&#129302;</span> I'm an Agent</button>
+    </div>
+
+    <div id="human-content">
     <div class="state" id="state-loading">
       <p class="loading-text"><span class="spinner"></span>Preparing...</p>
     </div>
@@ -190,11 +196,14 @@
       </div>
     </div>
 
-    <button class="agent-toggle" id="agent-toggle">Are you an agent?</button>
-    <div class="agent-panel" id="agent-panel">
-      <p>URL: <code>https://cloak.opsy.sh/s/{ID}#{KEY}</code></p>
-      <p>Retrieve: <code>curl -s -H "X-Cloak-Key: {KEY}" ".../api/secrets/{ID}"</code></p>
-      <p>Response: <code>{ "secret": "..." }</code> — destroyed after one read.</p>
+    </div>
+
+    <div id="agent-content" style="display:none">
+      <div class="agent-panel">
+        <p>URL: <code>https://cloak.opsy.sh/s/{ID}#{KEY}</code></p>
+        <p>Retrieve: <code>curl -s -H "X-Cloak-Key: {KEY}" ".../api/secrets/{ID}"</code></p>
+        <p>Response: <code>{ "secret": "..." }</code> — destroyed after one read.</p>
+      </div>
     </div>
 
     <div class="footer">
@@ -282,8 +291,18 @@
       }, 2000);
     });
 
-    document.getElementById("agent-toggle").addEventListener("click", () => {
-      document.getElementById("agent-panel").classList.toggle("visible");
+    document.getElementById("mode-human").addEventListener("click", () => {
+      document.getElementById("mode-human").classList.add("active");
+      document.getElementById("mode-agent").classList.remove("active");
+      document.getElementById("human-content").style.display = "";
+      document.getElementById("agent-content").style.display = "none";
+    });
+
+    document.getElementById("mode-agent").addEventListener("click", () => {
+      document.getElementById("mode-agent").classList.add("active");
+      document.getElementById("mode-human").classList.remove("active");
+      document.getElementById("human-content").style.display = "none";
+      document.getElementById("agent-content").style.display = "";
     });
 
     document.addEventListener("keydown", (e) => {

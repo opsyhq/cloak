@@ -206,35 +206,63 @@ kbd {
   display: block;
 }
 
-.agent-toggle {
-  background: none;
+.mode-toggle {
+  display: flex;
+  background: #111113;
   border: 1px solid #1e1e22;
-  border-radius: 6px;
-  color: #52525b;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.72rem;
-  cursor: pointer;
-  margin-top: 1.5rem;
-  padding: 0.35rem 0.75rem;
-  transition: color 0.15s, border-color 0.15s;
+  border-radius: 10px;
+  padding: 3px;
+  margin: 0 auto 2rem;
+  max-width: 260px;
+  position: relative;
 }
 
-.agent-toggle:hover { color: #71717a; border-color: #2d2d35; }
+.mode-toggle button {
+  flex: 1;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: #52525b;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  position: relative;
+  z-index: 1;
+}
+
+.mode-toggle button.active {
+  background: #1e1e22;
+  color: #fafafa;
+}
+
+.mode-toggle button:not(.active):hover {
+  color: #71717a;
+}
+
+.mode-toggle .mode-emoji {
+  font-size: 0.82rem;
+  line-height: 1;
+}
 
 .agent-panel {
-  display: none;
   text-align: left;
   background: #0c0c0e;
   border: 1px solid #1a1a1e;
   border-radius: 8px;
   padding: 0.85rem;
-  margin-top: 0.5rem;
   font-size: 0.72rem;
   color: #52525b;
   line-height: 1.6;
+  animation: fadeUp 0.3s ease-out;
 }
 
-.agent-panel.visible { display: block; }
 .agent-panel code { color: #6366f1; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; }
 .agent-panel p { margin-bottom: 0.35rem; }
 .agent-panel p:last-child { margin-bottom: 0; }
@@ -284,7 +312,8 @@ kbd {
   .btn-primary.block { padding: 0.65rem; }
   .copy-box { padding-right: 3rem; }
   .copy-btn { right: 0.45rem; }
-  .agent-toggle { margin-top: 1.5rem; }
+  .mode-toggle { max-width: 240px; margin-bottom: 1.5rem; }
+  .mode-toggle button { font-size: 0.72rem; padding: 0.4rem 0.6rem; }
   .agent-panel { padding: 0.75rem; font-size: 0.68rem; }
   .agent-panel code { font-size: 0.62rem; }
   .footer { margin-top: 2rem; font-size: 0.65rem; }
