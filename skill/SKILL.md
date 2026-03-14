@@ -21,15 +21,11 @@ metadata:
 
 # Cloak — One-Time Secret Sharing
 
-Cloak lets you create encrypted, self-destructing secret links. The secret is destroyed after one read. Use it to share API keys, passwords, tokens, and other sensitive values.
+Share API keys, passwords, and tokens via encrypted self-destructing links.
 
 **Base URL:** `https://cloak.opsy.sh`
 
----
-
-## Step 1: Create a Secret
-
-Send the secret to the API. The server encrypts it and returns a shareable URL.
+## Create a secret
 
 ```bash
 curl -s -X POST https://cloak.opsy.sh/api/secrets \
@@ -37,7 +33,7 @@ curl -s -X POST https://cloak.opsy.sh/api/secrets \
   -d '{"secret":"YOUR_SECRET_HERE"}'
 ```
 
-**Response:**
+Response:
 ```json
 {
   "id": "W9ZEykcG",
@@ -47,101 +43,62 @@ curl -s -X POST https://cloak.opsy.sh/api/secrets \
 }
 ```
 
-Share the `url` value with the recipient. That's it.
+Share the `url`. The secret self-destructs after one view.
 
-**Optional:** set a custom TTL with `"expiresIn"` (in seconds, default 24 hours, max 7 days):
+Set a custom TTL with `"expiresIn"` (seconds, default 24h, max 7d):
 ```bash
-curl -s -X POST https://cloak.opsy.sh/api/secrets \
-  -H "Content-Type: application/json" \
-  -d '{"secret":"YOUR_SECRET_HERE", "expiresIn": 3600}'
+-d '{"secret":"...", "expiresIn": 3600}'
 ```
 
----
+## Retrieve a secret
 
-## Step 2: Retrieve a Secret
-
-Given a Cloak URL like `https://cloak.opsy.sh/s/W9ZEykcG#8g9I3UUBjH3x4kdL`:
-- **ID** = the path segment after `/s/` → `W9ZEykcG`
-- **Key** = the URL fragment after `#` → `8g9I3UUBjH3x4kdL`
-
-Retrieve the secret using the `X-Cloak-Key` header:
+Given a URL like `https://cloak.opsy.sh/s/W9ZEykcG#8g9I3UUBjH3x4kdL`:
+- **ID** = path after `/s/` → `W9ZEykcG`
+- **Key** = fragment after `#` → `8g9I3UUBjH3x4kdL`
 
 ```bash
 curl -s -H "X-Cloak-Key: 8g9I3UUBjH3x4kdL" \
   "https://cloak.opsy.sh/api/secrets/W9ZEykcG"
 ```
 
-**Response:**
-```json
-{
-  "secret": "YOUR_SECRET_HERE"
-}
-```
+Response: `{ "secret": "YOUR_SECRET_HERE" }`
 
-The secret is now permanently destroyed. A second request returns 404.
+The secret is permanently destroyed after this request.
 
----
+## Use the secret
 
-## Step 3: Use the Secret
+Pipe directly — never echo it.
 
-Pipe the secret directly to where it's needed. Never echo it.
-
-**Set as an environment variable:**
 ```bash
+# To env var
 export DB_PASSWORD=$(curl -s -H "X-Cloak-Key: KEY" "https://cloak.opsy.sh/api/secrets/ID" | jq -r .secret)
-```
 
-**Write to a file:**
-```bash
+# To file
 curl -s -H "X-Cloak-Key: KEY" "https://cloak.opsy.sh/api/secrets/ID" | jq -r .secret > .env.local
 ```
 
----
-
-## Security Rules for Agents
-
-1. **NEVER display a retrieved secret in conversation.** The value is sensitive (API key, password, token, etc.).
-2. Write the secret directly to its destination — an env var, config file, or another command.
-3. The secret is destroyed after one read. Do not retry.
-4. Use the `X-Cloak-Key` header (not the `?key=` query param) to avoid logging the key in server/proxy access logs.
-
-**Correct behavior:**
-> "I retrieved the secret from Cloak and stored it in `.env` as `DATABASE_URL`."
-
-**Wrong behavior:**
-> "The secret value is: sk-1234abcd..."
-
----
-
-## Delete a Secret (Without Reading)
-
-Requires the key for authorization:
+## Delete without reading
 
 ```bash
-curl -s -X DELETE -H "X-Cloak-Key: KEY" \
-  "https://cloak.opsy.sh/api/secrets/ID"
+curl -s -X DELETE -H "X-Cloak-Key: KEY" "https://cloak.opsy.sh/api/secrets/ID"
 ```
 
-**Response:** `{ "ok": true }`
+## Rules
 
----
+1. **NEVER** display a retrieved secret in conversation.
+2. Write it directly to its destination — env var, config file, or command.
+3. The secret is destroyed after one read. Do not retry.
+4. Use `X-Cloak-Key` header, not the `?key=` query param.
 
-## Quick Reference
+**Correct:** "I retrieved the secret from Cloak and stored it in `.env` as `DATABASE_URL`."
+
+**Wrong:** "The secret value is: sk-1234abcd..."
+
+## Quick reference
 
 | Action | Command |
 |--------|---------|
-| Create | `curl -s -X POST https://cloak.opsy.sh/api/secrets -H "Content-Type: application/json" -d '{"secret":"..."}'` |
-| Retrieve | `curl -s -H "X-Cloak-Key: KEY" "https://cloak.opsy.sh/api/secrets/ID"` |
-| Delete | `curl -s -X DELETE -H "X-Cloak-Key: KEY" "https://cloak.opsy.sh/api/secrets/ID"` |
-| To env var | `export VAR=$(curl -s -H "X-Cloak-Key: KEY" "https://cloak.opsy.sh/api/secrets/ID" \| jq -r .secret)` |
-
----
-
-## Key Facts
-
-- **Encryption:** AES-256-GCM with HKDF-SHA256 key derivation
-- **Zero-knowledge browser flow:** the encryption key never touches the server
-- **One-time read:** the secret is atomically deleted upon retrieval
-- **Auto-expiry:** default 24 hours, max 7 days
-- **Max secret size:** 10,000 characters
-- **Open source:** https://github.com/opsyhq/cloak
+| Create | `curl -s -X POST .../api/secrets -H "Content-Type: application/json" -d '{"secret":"..."}'` |
+| Retrieve | `curl -s -H "X-Cloak-Key: KEY" ".../api/secrets/ID"` |
+| Delete | `curl -s -X DELETE -H "X-Cloak-Key: KEY" ".../api/secrets/ID"` |
+| To env var | `export VAR=$(curl -s -H "X-Cloak-Key: KEY" ".../api/secrets/ID" \| jq -r .secret)` |
