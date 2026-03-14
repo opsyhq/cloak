@@ -1,6 +1,7 @@
 ---
 name: cloak
 description: Share one-time secrets between humans and agents via encrypted self-destructing links
+version: 0.1.0
 triggers:
   - "share a secret"
   - "send secret"
@@ -14,6 +15,8 @@ metadata:
   openclaw:
     requires:
       bins: [curl, jq]
+    emoji: "🔒"
+    homepage: https://cloak.opsy.sh
 ---
 
 # Cloak — One-Time Secret Sharing

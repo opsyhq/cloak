@@ -1,0 +1,27 @@
+name: Publish to ClawHub
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install -g clawhub@latest
+
+      - run: clawhub login --token ${{ secrets.CLAWHUB_TOKEN }}
+
+      - run: |
+          clawhub publish skill/ \
+            --slug cloak \
+            --name "Cloak" \
+            --version ${{ github.event.release.tag_name }} \
+            --changelog "${{ github.event.release.body }}" \
+            --tags "security,secrets,encryption"
