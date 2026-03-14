@@ -1,0 +1,16 @@
+{
+  "id": "cloak",
+  "name": "Cloak",
+  "description": "One-time secret sharing for humans and agents",
+  "version": "0.1.0",
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "url": {
+        "type": "string",
+        "default": "https://cloak.opsy.sh",
+        "description": "Base URL of the Cloak instance"
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+name = "cloak"
+main = "src/index.ts"
+compatibility_date = "2026-03-14"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "cloak-db"
+database_id = "adcfba2e-b530-4ec5-97fb-f4795dcdb427"
+
+[vars]
+BASE_URL = "https://cloak.opsy.sh"
+
+[triggers]
+crons = ["0 * * * *"]

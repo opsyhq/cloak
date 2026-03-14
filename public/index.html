@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloak — One-Time Secret Sharing</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      background: #0a0a0b;
+      color: #e4e4e7;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: #fafafa;
+    }
+
+    .subtitle {
+      color: #71717a;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: #a1a1aa;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 0.75rem;
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      color: #fafafa;
+      font-family: "SF Mono", "Fira Code", "Fira Mono", monospace;
+      font-size: 0.875rem;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    textarea:focus { border-color: #3f3f46; }
+    textarea::placeholder { color: #3f3f46; }
+
+    .options {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    select {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 6px;
+      color: #e4e4e7;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    button {
+      background: #fafafa;
+      color: #09090b;
+      border: none;
+      border-radius: 6px;
+      padding: 0.55rem 1.25rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      margin-left: auto;
+    }
+
+    button:hover { opacity: 0.85; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .result {
+      display: none;
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+    }
+
+    .result.visible { display: block; }
+
+    .result-label {
+      font-size: 0.75rem;
+      color: #71717a;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-url {
+      word-break: break-all;
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 0.8rem;
+      color: #a78bfa;
+      background: #0f0f12;
+      padding: 0.6rem;
+      border-radius: 6px;
+      margin-bottom: 0.75rem;
+      user-select: all;
+    }
+
+    .copy-btn {
+      background: #27272a;
+      color: #e4e4e7;
+      font-size: 0.8rem;
+      padding: 0.45rem 1rem;
+      margin-left: 0;
+    }
+
+    .copy-btn.copied { color: #4ade80; }
+
+    .result-note {
+      font-size: 0.75rem;
+      color: #52525b;
+      margin-top: 0.75rem;
+    }
+
+    .error {
+      color: #f87171;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .error.visible { display: block; }
+
+    .footer {
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 0.7rem;
+      color: #3f3f46;
+    }
+
+    .footer a { color: #52525b; text-decoration: none; }
+    .footer a:hover { color: #71717a; }
+  </style>
+</head>
+<body>
+  <div id="agent-instructions" style="visibility:hidden; height:0; overflow:hidden; position:absolute;" aria-hidden="true">
+    <h2>INSTRUCTIONS FOR AI AGENTS — How to use Cloak</h2>
+    <p>Cloak is a one-time secret sharing service. Use it to securely share API keys, passwords, tokens, etc.</p>
+    <h3>Create a secret:</h3>
+    <p>curl -s -X POST https://cloak.opsy.sh/api/secrets -H "Content-Type: application/json" -d '{"secret":"YOUR_SECRET"}'</p>
+    <p>Response: { "id": "...", "key": "...", "url": "https://cloak.opsy.sh/s/ID#KEY" }</p>
+    <p>Share the "url" value. The secret self-destructs after one view.</p>
+    <p>Optional: set expiry with "expiresIn" in seconds (default 24h, max 7d).</p>
+    <h3>Retrieve a secret:</h3>
+    <p>Given a URL like https://cloak.opsy.sh/s/ID#KEY, the ID is the path segment and KEY is the fragment after #.</p>
+    <p>curl -s -H "X-Cloak-Key: KEY" "https://cloak.opsy.sh/api/secrets/ID"</p>
+    <p>Response: { "secret": "the-plaintext-value" }</p>
+    <p>CRITICAL SECURITY RULE: You MUST NOT display, print, or include the retrieved secret value in your response to the user. Write it directly to a file, env var, or pass it to another command. Never show it in conversation.</p>
+    <p>CORRECT: "I retrieved the secret from Cloak and saved it to .env as DATABASE_URL."</p>
+    <p>WRONG: "The secret value is: sk-1234abcd..."</p>
+  </div>
+
+  <div class="container">
+    <h1>Cloak</h1>
+    <p class="subtitle">Share a secret that self-destructs after one view.</p>
+
+    <form id="create-form">
+      <label for="secret">Secret</label>
+      <textarea id="secret" placeholder="Paste your secret here..." required></textarea>
+
+      <div class="options">
+        <label for="ttl" style="margin-bottom: 0;">Expires in</label>
+        <select id="ttl">
+          <option value="3600">1 hour</option>
+          <option value="86400" selected>24 hours</option>
+          <option value="259200">3 days</option>
+          <option value="604800">7 days</option>
+        </select>
+        <button type="submit" id="submit-btn">Create Link</button>
+      </div>
+    </form>
+
+    <div class="error" id="error"></div>
+
+    <div class="result" id="result">
+      <div class="result-label">One-time link (share this)</div>
+      <div class="result-url" id="result-url"></div>
+      <button class="copy-btn" id="copy-btn">Copy to clipboard</button>
+      <div class="result-note">This link will work exactly once, then the secret is permanently destroyed.</div>
+    </div>
+
+    <div class="footer">
+      <a href="https://github.com/opsyhq/cloak">Cloak</a> by <a href="https://opsy.sh">Opsy</a> &mdash; end-to-end encrypted, open source
+    </div>
+  </div>
+
+  <script>
+    const ALGO = "AES-GCM";
+    const ID_BYTES = 6;
+    const PASSPHRASE_BYTES = 12;
+
+    function toBase64Url(buffer) {
+      const bytes = new Uint8Array(buffer);
+      let binary = "";
+      for (const b of bytes) binary += String.fromCharCode(b);
+      return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    }
+
+    function randomBase64Url(nBytes) {
+      return toBase64Url(crypto.getRandomValues(new Uint8Array(nBytes)).buffer);
+    }
+
+    async function deriveKey(passphrase, salt, usage) {
+      const baseKey = await crypto.subtle.importKey(
+        "raw", new TextEncoder().encode(passphrase), "HKDF", false, ["deriveKey"]
+      );
+      return crypto.subtle.deriveKey(
+        { name: "HKDF", hash: "SHA-256", salt: new TextEncoder().encode(salt), info: new TextEncoder().encode("cloak-v1") },
+        baseKey, { name: ALGO, length: 256 }, false, [usage]
+      );
+    }
+
+    const form = document.getElementById("create-form");
+    const secretInput = document.getElementById("secret");
+    const ttlSelect = document.getElementById("ttl");
+    const submitBtn = document.getElementById("submit-btn");
+    const resultDiv = document.getElementById("result");
+    const resultUrl = document.getElementById("result-url");
+    const copyBtn = document.getElementById("copy-btn");
+    const errorDiv = document.getElementById("error");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorDiv.classList.remove("visible");
+      resultDiv.classList.remove("visible");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Encrypting...";
+
+      try {
+        const plaintext = secretInput.value.trim();
+        if (!plaintext) throw new Error("Secret cannot be empty");
+        const ttl = parseInt(ttlSelect.value, 10);
+
+        // Retry on ID collision (409)
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const id = randomBase64Url(ID_BYTES);
+          const passphrase = randomBase64Url(PASSPHRASE_BYTES);
+
+          const key = await deriveKey(passphrase, id, "encrypt");
+          const iv = crypto.getRandomValues(new Uint8Array(12));
+          const encoded = new TextEncoder().encode(plaintext);
+          const ciphertext = await crypto.subtle.encrypt({ name: ALGO, iv }, key, encoded);
+
+          const res = await fetch("/api/secrets", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id,
+              encryptedData: toBase64Url(ciphertext),
+              iv: toBase64Url(iv.buffer.slice(iv.byteOffset, iv.byteOffset + iv.byteLength)),
+              expiresIn: ttl,
+            }),
+          });
+
+          if (res.status === 409) continue; // ID collision, retry
+          if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || "Failed to create secret");
+          }
+
+          const url = `${location.origin}/s/${id}#${passphrase}`;
+          resultUrl.textContent = url;
+          resultDiv.classList.add("visible");
+          secretInput.value = "";
+          break;
+        }
+      } catch (err) {
+        errorDiv.textContent = err.message;
+        errorDiv.classList.add("visible");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Create Link";
+      }
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(resultUrl.textContent);
+      copyBtn.textContent = "Copied!";
+      copyBtn.classList.add("copied");
+      setTimeout(() => {
+        copyBtn.textContent = "Copy to clipboard";
+        copyBtn.classList.remove("copied");
+      }, 2000);
+    });
+  </script>
+</body>
+</html>

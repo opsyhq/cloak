@@ -1,0 +1,28 @@
+{
+  "name": "@opsy/cloak",
+  "version": "0.1.0",
+  "description": "One-time secret sharing for humans & agents",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/opsyhq/cloak"
+  },
+  "bin": {
+    "cloak": "./cli/index.ts"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "db:init": "wrangler d1 execute cloak-db --local --file=schema.sql",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+  },
+  "dependencies": {
+    "hono": "^4.12.8"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260313.1",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.4.0"
+  }
+}
