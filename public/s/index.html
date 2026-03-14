@@ -81,172 +81,147 @@
     }
 
     /* Ready state */
-    .reveal-card {
-      background: #111113;
-      border: 1px solid #1e1e22;
-      border-radius: 12px;
-      padding: 2rem 1.5rem;
-    }
-
-    .reveal-icon {
-      width: 52px;
-      height: 52px;
-      margin: 0 auto 1.25rem;
-      border-radius: 50%;
-      background: rgba(99, 102, 241, 0.06);
-      border: 1px solid rgba(99, 102, 241, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .reveal-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #fafafa;
-      margin-bottom: 0.35rem;
-    }
-
-    .reveal-subtitle {
+    /* Ready */
+    .reveal-hint {
       font-size: 0.8rem;
       color: #52525b;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
       line-height: 1.5;
     }
 
     .btn-reveal {
+      width: 100%;
       background: #fafafa;
       color: #09090b;
       border: none;
       border-radius: 8px;
-      padding: 0.65rem 2rem;
+      padding: 0.65rem;
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
       transition: transform 0.15s, opacity 0.15s;
-      width: 100%;
-      max-width: 220px;
     }
 
     .btn-reveal:hover { transform: translateY(-1px); opacity: 0.92; }
     .btn-reveal:active { transform: translateY(0); }
 
+    .reveal-warning {
+      font-size: 0.7rem;
+      color: #3f3f46;
+      margin-top: 0.75rem;
+    }
+
     /* Loading */
     .loading-text {
       color: #71717a;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
     }
 
     .spinner {
       display: inline-block;
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border: 2px solid #27272a;
       border-top-color: #71717a;
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
       vertical-align: middle;
-      margin-right: 0.5rem;
+      margin-right: 0.4rem;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Revealed */
-    .secret-card {
-      background: #111113;
-      border: 1px solid #1e1e22;
-      border-radius: 12px;
-      padding: 1.5rem;
-      text-align: left;
+    .revealed-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
     }
 
-    .secret-label {
-      font-size: 0.68rem;
-      color: #52525b;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 0.5rem;
+    .revealed-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      flex-shrink: 0;
+    }
+
+    .revealed-title {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #a1a1aa;
     }
 
     .secret-content {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.82rem;
       color: #fafafa;
-      background: #08080a;
+      background: #111113;
       border: 1px solid #1e1e22;
       padding: 0.85rem;
-      border-radius: 8px;
+      border-radius: 10px;
       white-space: pre-wrap;
       word-break: break-all;
       max-height: 300px;
       overflow-y: auto;
       line-height: 1.6;
+      margin-bottom: 0.85rem;
     }
 
-    .secret-actions {
-      display: flex;
-      gap: 0.5rem;
+    .btn-copy {
+      width: 100%;
+      background: #fafafa;
+      color: #09090b;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+
+    .btn-copy:hover { transform: translateY(-1px); opacity: 0.92; }
+    .btn-copy:active { transform: translateY(0); }
+    .btn-copy.copied { background: #22c55e; color: #fff; }
+
+    .destroyed-note {
+      font-size: 0.7rem;
+      color: #ef4444;
+      opacity: 0.7;
       margin-top: 0.75rem;
     }
 
-    .btn-action {
-      background: #1e1e22;
-      border: none;
-      border-radius: 6px;
-      color: #a1a1aa;
-      padding: 0.45rem 0.85rem;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.76rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
-    }
-
-    .btn-action:hover { background: #27272a; color: #d4d4d8; }
-    .btn-action.copied { color: #22c55e; background: rgba(34, 197, 94, 0.08); }
-
-    .destroyed-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      margin-top: 1rem;
-      padding: 0.4rem 0.75rem;
-      background: rgba(239, 68, 68, 0.06);
-      border: 1px solid rgba(239, 68, 68, 0.1);
-      border-radius: 6px;
-      font-size: 0.72rem;
-      color: #ef4444;
-    }
-
     /* Error */
-    .error-card {
-      background: #111113;
-      border: 1px solid #1e1e22;
-      border-radius: 12px;
-      padding: 2rem 1.5rem;
-    }
-
-    .error-icon {
-      width: 44px;
-      height: 44px;
-      margin: 0 auto 1rem;
-      border-radius: 50%;
-      background: rgba(239, 68, 68, 0.06);
-      border: 1px solid rgba(239, 68, 68, 0.1);
+    .error-status {
       display: flex;
       align-items: center;
-      justify-content: center;
-      color: #ef4444;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .error-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      flex-shrink: 0;
+    }
+
+    .error-label {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #a1a1aa;
     }
 
     .error-text {
-      color: #a1a1aa;
-      font-size: 0.85rem;
+      color: #52525b;
+      font-size: 0.8rem;
       line-height: 1.5;
     }
-
-    .error-text strong { color: #d4d4d8; }
 
     /* Agent toggle */
     .agent-toggle {
@@ -310,18 +285,8 @@
       .brand-icon { width: 40px; height: 40px; margin-bottom: 0.75rem; }
       .brand h1 { font-size: 1.2rem; }
       .brand p { font-size: 0.78rem; }
-      .reveal-card { padding: 1.5rem 1.15rem; }
-      .reveal-icon { width: 44px; height: 44px; margin-bottom: 1rem; }
-      .reveal-title { font-size: 0.92rem; }
-      .reveal-subtitle { font-size: 0.76rem; margin-bottom: 1.25rem; }
-      .btn-reveal { max-width: 100%; padding: 0.7rem; font-size: 0.85rem; }
-      .secret-card { padding: 1.15rem; }
       .secret-content { font-size: 0.78rem; padding: 0.75rem; }
-      .btn-action { padding: 0.45rem 0.75rem; font-size: 0.73rem; }
-      .destroyed-badge { font-size: 0.68rem; padding: 0.35rem 0.65rem; }
-      .error-card { padding: 1.5rem 1.15rem; }
-      .error-icon { width: 40px; height: 40px; }
-      .error-text { font-size: 0.8rem; }
+      .error-text { font-size: 0.76rem; }
       .agent-toggle { margin-top: 1.5rem; }
       .agent-panel { padding: 0.75rem; font-size: 0.68rem; }
       .agent-panel code { font-size: 0.62rem; }
@@ -333,7 +298,6 @@
       body { padding: 0.75rem; }
       .brand-icon { width: 36px; height: 36px; }
       .brand h1 { font-size: 1.1rem; }
-      .reveal-card, .secret-card, .error-card { padding: 1rem; }
       .secret-content { font-size: 0.72rem; }
     }
   </style>
@@ -371,41 +335,29 @@
 
     <!-- Ready -->
     <div class="state" id="state-ready">
-      <div class="reveal-card">
-        <div class="reveal-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
-          </svg>
-        </div>
-        <div class="reveal-title">You have a secret</div>
-        <div class="reveal-subtitle">It will be permanently destroyed after you view it.</div>
-        <button class="btn-reveal" id="reveal-btn">Reveal secret</button>
-      </div>
+      <p class="reveal-hint">This secret will be permanently destroyed after you view it.</p>
+      <button class="btn-reveal" id="reveal-btn">Reveal secret</button>
+      <p class="reveal-warning">One-time only. No second chance.</p>
     </div>
 
     <!-- Revealed -->
     <div class="state" id="state-revealed">
-      <div class="secret-card">
-        <div class="secret-label">Secret</div>
-        <div class="secret-content" id="secret-content"></div>
-        <div class="secret-actions">
-          <button class="btn-action" id="copy-btn">Copy</button>
-        </div>
+      <div class="revealed-status">
+        <div class="revealed-dot"></div>
+        <div class="revealed-title">Secret revealed — now destroyed.</div>
       </div>
-      <div class="destroyed-badge">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M4 4l4 4M8 4l-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-        This secret has been destroyed
-      </div>
+      <div class="secret-content" id="secret-content"></div>
+      <button class="btn-copy" id="copy-btn">Copy secret</button>
+      <p class="destroyed-note">This secret has been permanently deleted from the server.</p>
     </div>
 
     <!-- Error -->
     <div class="state" id="state-error">
-      <div class="error-card">
-        <div class="error-icon">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v5M10 13.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </div>
-        <p class="error-text" id="error-msg"></p>
+      <div class="error-status">
+        <div class="error-dot"></div>
+        <div class="error-label">Not found</div>
       </div>
+      <p class="error-text" id="error-msg"></p>
     </div>
 
     <button class="agent-toggle" id="agent-toggle">API access</button>
@@ -416,8 +368,8 @@
     </div>
 
     <div class="footer">
-      <a href="/">Create a secret</a> &nbsp;&middot;&nbsp; <a href="https://github.com/opsyhq/cloak">GitHub</a> &nbsp;&middot;&nbsp; E2E encrypted
-      <br/>Built by <a href="https://opsy.sh">Opsy</a>
+      <a href="https://github.com/opsyhq/cloak">GitHub</a> &nbsp;&middot;&nbsp; E2E encrypted
+      <br/>Built by <a href="https://opsy.sh">Opsy</a> &nbsp;&middot;&nbsp; <a href="/">Create your own</a>
     </div>
   </div>
 
@@ -491,7 +443,7 @@
       await navigator.clipboard.writeText(document.getElementById("secret-content").textContent);
       btn.textContent = "Copied!";
       btn.classList.add("copied");
-      setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
+      setTimeout(() => { btn.textContent = "Copy secret"; btn.classList.remove("copied"); }, 2000);
     });
 
     document.getElementById("agent-toggle").addEventListener("click", () => {
