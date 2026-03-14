@@ -49,6 +49,19 @@ export async function consumeSecret(
   return result ?? null;
 }
 
+// Non-destructive read for decrypt-then-delete flow
+export async function getSecret(
+  db: D1Database,
+  id: string
+): Promise<SecretRecord | null> {
+  const now = Math.floor(Date.now() / 1000);
+  const result = await db
+    .prepare("SELECT * FROM secrets WHERE id = ? AND expires_at > ?")
+    .bind(id, now)
+    .first<SecretRecord>();
+  return result ?? null;
+}
+
 export async function deleteSecret(
   db: D1Database,
   id: string

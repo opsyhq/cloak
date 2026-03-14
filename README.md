@@ -33,7 +33,48 @@ https://cloak.opsy.sh/s/W9ZEykcG#8g9I3UUBjH3x4kdL
                        ID        key (never sent to server)
 ```
 
-> **Zero-knowledge in the browser.** The encryption key stays in the URL fragment — browsers never send it to the server. The server only stores an encrypted blob it can't read.
+> **Two modes, choose your trust level:**
+> - **Browser** — zero-knowledge. Client encrypts/decrypts; the server only stores an encrypted blob it can't read.
+> - **API / CLI / Agent** — server-assisted over TLS. Plaintext is sent to the server for encryption but is never stored. Use this when you can't run a browser.
+
+## For AI Agents
+
+When an agent receives a Cloak URL:
+
+1. **Parse the URL** — ID is the path after `/s/`, key is the fragment after `#`
+2. **Call the API** — `curl -s -H "X-Cloak-Key: KEY" "https://cloak.opsy.sh/api/secrets/ID"`
+3. **Never display the secret** — pipe it to a file, env var, or command. Never echo it in conversation.
+
+Agents can also **create** secrets and send links to humans — the flow is bidirectional.
+
+The reveal page embeds agent instructions in a hidden DOM element and supports `Accept: application/json` for structured retrieval instructions.
+
+<details>
+<summary><strong>ClawHub Skill</strong></summary>
+
+Published to [ClawHub](https://clawhub.ai) as [`cloak`](https://clawhub.ai/saba-ch/cloak). Install it:
+
+```bash
+clawhub install cloak
+```
+</details>
+
+<details>
+<summary><strong>OpenClaw Plugin</strong></summary>
+
+The `plugin/` directory registers `cloak_create` and `cloak_get` as native agent tools.
+
+The `cli/openclaw-resolver.ts` acts as an `exec` secret provider — secrets get injected into agent environments without appearing in conversation.
+
+```json
+{
+  "source": "exec",
+  "provider": "cloak",
+  "command": "cloak-resolver",
+  "passEnv": ["CLOAK_URL"]
+}
+```
+</details>
 
 ## Quickstart
 
@@ -115,7 +156,7 @@ curl -s -H "X-Cloak-Key: 8g9I3UUBjH3x4kdL" \
 # → {"secret":"sk-abc123"}
 ```
 
-The secret is atomically deleted upon retrieval. Returns `404` if not found, expired, or already read.
+The secret is deleted after successful decryption. A wrong key returns `403` without destroying the secret. Returns `404` if not found, expired, or already read.
 
 ### `DELETE /api/secrets/:id`
 
@@ -127,49 +168,12 @@ curl -s -X DELETE -H "X-Cloak-Key: 8g9I3UUBjH3x4kdL" \
 # → {"ok":true}
 ```
 
-## For AI Agents
-
-When an agent receives a Cloak URL:
-
-1. **Parse the URL** — ID is the path after `/s/`, key is the fragment after `#`
-2. **Call the API** — `curl -s -H "X-Cloak-Key: KEY" "https://cloak.opsy.sh/api/secrets/ID"`
-3. **Never display the secret** — pipe it to a file, env var, or command. Never echo it in conversation.
-
-The reveal page embeds agent instructions in a hidden DOM element and supports `Accept: application/json` for structured retrieval instructions.
-
-<details>
-<summary><strong>ClawHub Skill</strong></summary>
-
-Published to [ClawHub](https://clawhub.ai) as [`cloak`](https://clawhub.ai/saba-ch/cloak). Install it:
-
-```bash
-clawhub install cloak
-```
-</details>
-
-<details>
-<summary><strong>OpenClaw Plugin</strong></summary>
-
-The `plugin/` directory registers `cloak_create` and `cloak_get` as native agent tools.
-
-The `cli/openclaw-resolver.ts` acts as an `exec` secret provider — secrets get injected into agent environments without appearing in conversation.
-
-```json
-{
-  "source": "exec",
-  "provider": "cloak",
-  "command": "cloak-resolver",
-  "passEnv": ["CLOAK_URL"]
-}
-```
-</details>
-
 ## Security
 
 - **AES-256-GCM** with HKDF-SHA256 key derivation (96-bit passphrase entropy)
 - **Zero-knowledge browser flow** — server never sees plaintext or key
-- **Atomic one-time read** — `DELETE ... RETURNING` prevents race condition double-reads
-- **Authenticated delete** — requires the encryption key
+- **Safe retrieval** — wrong key returns 403 without destroying the secret; browser flow uses atomic `DELETE ... RETURNING`
+- **Authenticated delete** — verifies the encryption key before deleting
 - **CORS restricted** — API only accepts requests from the app's origin
 - **No crawling** — `robots.txt`, `X-Robots-Tag` headers, `noindex` meta tags
 - **Auto-expiry** — hourly cleanup via Cloudflare Cron Triggers

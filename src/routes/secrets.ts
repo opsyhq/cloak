@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { generatePassphrase, encrypt, decrypt } from "../crypto";
-import { generateId, storeSecret, consumeSecret, deleteSecret } from "../db";
+import { generateId, storeSecret, consumeSecret, getSecret, deleteSecret } from "../db";
 
 type Env = { Bindings: { DB: D1Database; BASE_URL?: string } };
 
@@ -9,7 +9,7 @@ const BASE_URL_DEFAULT = "https://cloak.opsy.sh";
 const secrets = new Hono<Env>();
 
 const MAX_SECRET_LENGTH = 10_000;
-const MAX_ENCRYPTED_LENGTH = 20_000; // base64 overhead on 10K
+const MAX_ENCRYPTED_LENGTH = 20_000;
 const MAX_IV_LENGTH = 24;
 const DEFAULT_TTL = 24 * 60 * 60;
 const MAX_TTL = 7 * 24 * 60 * 60;
@@ -53,7 +53,6 @@ secrets.post("/", async (c) => {
     try {
       await storeSecret(c.env.DB, id, encryptedData, iv, expiresAt);
     } catch {
-      // ID collision — client should retry with a new ID
       return c.json({ error: "ID conflict, please retry" }, 409);
     }
     return c.json({ id, expiresAt });
@@ -68,7 +67,6 @@ secrets.post("/", async (c) => {
     return c.json({ error: `Secret too large (max ${MAX_SECRET_LENGTH} characters)` }, 400);
   }
 
-  // Retry on ID collision (unlikely but possible)
   for (let attempt = 0; attempt < 3; attempt++) {
     const id = generateId();
     const passphrase = generatePassphrase();
@@ -79,7 +77,7 @@ secrets.post("/", async (c) => {
       const url = `${baseUrl}/s/${id}#${passphrase}`;
       return c.json({ id, key: passphrase, url, expiresAt });
     } catch {
-      continue; // ID collision, retry
+      continue;
     }
   }
 
@@ -94,20 +92,25 @@ secrets.get("/:id", async (c) => {
 
   const key = c.req.header("X-Cloak-Key") || c.req.query("key");
 
-  // Atomic read-and-delete: no race condition
-  const record = await consumeSecret(c.env.DB, id);
+  // Browser flow (no key): atomic consume — client decrypts, so wrong-key risk is theirs
+  if (!key) {
+    const record = await consumeSecret(c.env.DB, id);
+    if (!record) {
+      return c.json({ error: "Secret not found or expired" }, 404);
+    }
+    return c.json({ encryptedData: record.encrypted_data, iv: record.iv });
+  }
+
+  // Curl/agent flow (key provided): read first, decrypt, delete only on success
+  // This prevents a wrong key from destroying the secret
+  const record = await getSecret(c.env.DB, id);
   if (!record) {
     return c.json({ error: "Secret not found or expired" }, 404);
   }
 
-  // Zero-knowledge browser flow: return encrypted blob
-  if (!key) {
-    return c.json({ encryptedData: record.encrypted_data, iv: record.iv });
-  }
-
-  // Curl/agent flow: server decrypts
   try {
     const plaintext = await decrypt(record.encrypted_data, record.iv, key, id);
+    await deleteSecret(c.env.DB, id);
     return c.json(
       {
         secret: plaintext,
@@ -121,7 +124,7 @@ secrets.get("/:id", async (c) => {
   }
 });
 
-// DELETE requires the key to prevent unauthenticated destruction
+// DELETE verifies the key by attempting decryption before deleting
 secrets.delete("/:id", async (c) => {
   const id = c.req.param("id");
   if (!ID_PATTERN.test(id)) {
@@ -133,10 +136,19 @@ secrets.delete("/:id", async (c) => {
     return c.json({ error: "Key required to delete a secret" }, 401);
   }
 
-  const deleted = await deleteSecret(c.env.DB, id);
-  if (!deleted) {
+  const record = await getSecret(c.env.DB, id);
+  if (!record) {
     return c.json({ error: "Secret not found" }, 404);
   }
+
+  // Verify the key is correct before allowing deletion
+  try {
+    await decrypt(record.encrypted_data, record.iv, key, id);
+  } catch {
+    return c.json({ error: "Invalid key" }, 403);
+  }
+
+  await deleteSecret(c.env.DB, id);
   return c.json({ ok: true });
 });
 
