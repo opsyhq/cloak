@@ -9,110 +9,8 @@
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, nocache">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared.css">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: #08080a;
-      color: #d4d4d8;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: -40%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 800px;
-      height: 600px;
-      background: radial-gradient(ellipse, rgba(99, 102, 241, 0.06) 0%, rgba(99, 102, 241, 0.02) 40%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 480px;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Brand — matches index.html exactly */
-    .brand {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
-
-    .brand-icon {
-      width: 48px;
-      height: 48px;
-      margin: 0 auto 1rem;
-      opacity: 0.9;
-    }
-
-    .brand h1 {
-      font-size: 1.35rem;
-      font-weight: 600;
-      color: #fafafa;
-      letter-spacing: -0.02em;
-    }
-
-    .brand p {
-      color: #71717a;
-      font-size: 0.82rem;
-      margin-top: 0.3rem;
-      line-height: 1.5;
-    }
-
-    /* Shared components */
-    kbd {
-      display: inline-block;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.65rem;
-      font-weight: 400;
-      color: inherit;
-      opacity: 0.45;
-      margin-left: 0.3rem;
-      vertical-align: baseline;
-    }
-
-    .btn-primary {
-      background: #fafafa;
-      color: #09090b;
-      border: none;
-      border-radius: 8px;
-      padding: 0.55rem 1.3rem;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.15s, opacity 0.15s;
-    }
-
-    .btn-primary:hover { transform: translateY(-1px); opacity: 0.92; }
-    .btn-primary:active { transform: translateY(0); }
-
-    .btn-secondary {
-      background: none;
-      border: none;
-      color: #52525b;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.72rem;
-      cursor: pointer;
-      padding: 0;
-      transition: color 0.15s;
-    }
-
-    .btn-secondary:hover { color: #71717a; }
-
     .status-row {
       display: flex;
       align-items: center;
@@ -135,7 +33,6 @@
       color: #a1a1aa;
     }
 
-    /* States */
     .state { display: none; }
     .state.active { display: block; animation: fadeUp 0.3s ease-out; }
 
@@ -144,7 +41,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Ready */
     #state-ready { text-align: center; }
 
     .reveal-hint {
@@ -160,7 +56,6 @@
       margin-top: 0.75rem;
     }
 
-    /* Loading */
     .loading-text {
       text-align: center;
       color: #71717a;
@@ -181,7 +76,6 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Revealed */
     .secret-content {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.82rem;
@@ -198,17 +92,6 @@
       margin-bottom: 0.85rem;
     }
 
-    .revealed-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .revealed-note {
-      font-size: 0.7rem;
-      color: #3f3f46;
-    }
-
     .create-link {
       display: inline-block;
       margin-top: 1.25rem;
@@ -220,93 +103,18 @@
 
     .create-link:hover { color: #a1a1aa; }
 
-    /* Error */
     .error-text {
       color: #52525b;
       font-size: 0.8rem;
       line-height: 1.5;
     }
 
-    /* Agent panel — matches index.html exactly */
-    .agent-toggle {
-      background: none;
-      border: 1px solid #1e1e22;
-      border-radius: 6px;
-      color: #52525b;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.72rem;
-      cursor: pointer;
-      margin-top: 1.5rem;
-      padding: 0.35rem 0.75rem;
-      transition: color 0.15s, border-color 0.15s;
-    }
-
-    .agent-toggle:hover { color: #71717a; border-color: #2d2d35; }
-
-    .agent-panel {
-      display: none;
-      text-align: left;
-      background: #0c0c0e;
-      border: 1px solid #1a1a1e;
-      border-radius: 8px;
-      padding: 0.85rem;
-      margin-top: 0.5rem;
-      font-size: 0.72rem;
-      color: #52525b;
-      line-height: 1.6;
-    }
-
-    .agent-panel.visible { display: block; }
-    .agent-panel code { color: #6366f1; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; }
-    .agent-panel p { margin-bottom: 0.35rem; }
-    .agent-panel p:last-child { margin-bottom: 0; }
-
-    /* Footer — matches index.html exactly */
-    .footer {
-      text-align: center;
-      margin-top: 3rem;
-      font-size: 0.72rem;
-      color: #3f3f46;
-      line-height: 1.8;
-    }
-
-    .footer a {
-      color: #52525b;
-      text-decoration: none;
-      transition: color 0.15s;
-    }
-
-    .footer a:hover { color: #71717a; }
-
-    /* Tablet */
-    @media (max-width: 768px) {
-      kbd { display: none; }
-      body { padding: 1.25rem; }
-      .brand { margin-bottom: 2rem; }
-      .brand-icon { width: 44px; height: 44px; }
-    }
-
-    /* Mobile */
     @media (max-width: 480px) {
-      body { padding: 1rem 0.85rem; }
-      .container { max-width: 100%; }
-      .brand { margin-bottom: 1.75rem; }
-      .brand-icon { width: 40px; height: 40px; margin-bottom: 0.75rem; }
-      .brand h1 { font-size: 1.2rem; }
-      .brand p { font-size: 0.78rem; }
       .secret-content { font-size: 0.78rem; padding: 0.75rem; }
       .error-text { font-size: 0.76rem; }
-      .agent-toggle { margin-top: 1.5rem; }
-      .agent-panel { padding: 0.75rem; font-size: 0.68rem; }
-      .agent-panel code { font-size: 0.62rem; }
-      .footer { margin-top: 2rem; font-size: 0.65rem; }
     }
 
-    /* Small phones */
     @media (max-width: 360px) {
-      body { padding: 0.75rem; }
-      .brand-icon { width: 36px; height: 36px; }
-      .brand h1 { font-size: 1.1rem; }
       .secret-content { font-size: 0.72rem; }
     }
   </style>
@@ -337,40 +145,49 @@
       <p>Someone shared a secret with you.</p>
     </div>
 
-    <!-- Loading -->
     <div class="state" id="state-loading">
       <p class="loading-text"><span class="spinner"></span>Preparing...</p>
     </div>
 
-    <!-- Ready -->
     <div class="state active" id="state-ready">
       <p class="reveal-hint">This secret will be permanently destroyed after you view it.</p>
       <button class="btn-primary" id="reveal-btn">Reveal secret <kbd>&#9166;</kbd></button>
       <p class="reveal-note">One-time only. No second chance.</p>
     </div>
 
-    <!-- Revealed -->
     <div class="state" id="state-revealed">
       <div class="status-row">
         <div class="status-dot red"></div>
         <div class="status-text">Secret revealed — now destroyed.</div>
       </div>
-      <div class="secret-content" id="secret-content"></div>
-      <div class="revealed-footer">
-        <div class="revealed-note">Permanently deleted</div>
-        <button class="btn-secondary" id="copy-btn">Copy <kbd>C</kbd></button>
+      <div class="copy-row">
+        <div class="secret-content copy-box" id="secret-content"></div>
+        <button class="copy-btn" id="copy-btn" type="button" aria-label="Copy secret" title="Copy secret (C)">
+          <svg class="copy-icon copy-icon-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="13" height="13" rx="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <svg class="copy-icon copy-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </button>
       </div>
-      <a href="/" class="create-link">Create your own secret</a>
+      <div class="action-footer">
+        <div class="action-note">Permanently deleted</div>
+        <a href="/" class="btn-secondary create-link">Create your own secret</a>
+      </div>
     </div>
 
-    <!-- Error -->
     <div class="state" id="state-error">
       <div class="status-row">
         <div class="status-dot red"></div>
         <div class="status-text">Not found</div>
       </div>
       <p class="error-text" id="error-msg"></p>
-      <a href="/" class="create-link">Create a new secret</a>
+      <div class="action-footer">
+        <div class="action-note">Already viewed, expired, or invalid</div>
+        <a href="/" class="btn-secondary create-link">Create a new secret</a>
+      </div>
     </div>
 
     <button class="agent-toggle" id="agent-toggle">API access</button>
@@ -454,9 +271,14 @@
     document.getElementById("copy-btn").addEventListener("click", async () => {
       const btn = document.getElementById("copy-btn");
       await navigator.clipboard.writeText(document.getElementById("secret-content").textContent);
-      btn.innerHTML = "Copied!";
       btn.classList.add("copied");
-      setTimeout(() => { btn.innerHTML = 'Copy <kbd>C</kbd>'; btn.classList.remove("copied"); }, 2000);
+      btn.setAttribute("aria-label", "Copied");
+      btn.setAttribute("title", "Copied");
+      setTimeout(() => {
+        btn.classList.remove("copied");
+        btn.setAttribute("aria-label", "Copy secret");
+        btn.setAttribute("title", "Copy secret (C)");
+      }, 2000);
     });
 
     document.getElementById("agent-toggle").addEventListener("click", () => {

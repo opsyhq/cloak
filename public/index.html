@@ -6,115 +6,11 @@
   <title>Cloak — One-Time Secret Sharing</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared.css">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: #08080a;
-      color: #d4d4d8;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      overflow-x: hidden;
-    }
-
-    /* Atmospheric background glow */
-    body::before {
-      content: '';
-      position: fixed;
-      top: -40%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 800px;
-      height: 600px;
-      background: radial-gradient(ellipse, rgba(99, 102, 241, 0.06) 0%, rgba(99, 102, 241, 0.02) 40%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 480px;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Logo / Brand */
-    .brand {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
-
-    .brand-icon {
-      width: 48px;
-      height: 48px;
-      margin: 0 auto 1rem;
-      opacity: 0.9;
-    }
-
-    .brand h1 {
-      font-size: 1.35rem;
-      font-weight: 600;
-      color: #fafafa;
-      letter-spacing: -0.02em;
-    }
-
-    .brand p {
-      color: #71717a;
-      font-size: 0.82rem;
-      margin-top: 0.3rem;
-      line-height: 1.5;
-    }
-
-    .brand .hint {
-      color: #3f3f46;
-      font-size: 0.72rem;
-      margin-top: 0.5rem;
-    }
-
-    /* Agent panel */
-    .agent-toggle {
-      background: none;
-      border: 1px solid #1e1e22;
-      border-radius: 6px;
-      color: #52525b;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.72rem;
-      cursor: pointer;
-      margin-top: 1.5rem;
-      padding: 0.35rem 0.75rem;
-      transition: color 0.15s, border-color 0.15s;
-    }
-
-    .agent-toggle:hover { color: #71717a; border-color: #2d2d35; }
-
-    .agent-panel {
-      display: none;
-      text-align: left;
-      background: #0c0c0e;
-      border: 1px solid #1a1a1e;
-      border-radius: 8px;
-      padding: 0.85rem;
-      margin-top: 0.5rem;
-      font-size: 0.72rem;
-      color: #52525b;
-      line-height: 1.6;
-    }
-
-    .agent-panel.visible { display: block; }
-    .agent-panel code { color: #6366f1; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; }
-    .agent-panel p { margin-bottom: 0.35rem; }
-    .agent-panel p:last-child { margin-bottom: 0; }
-
-    /* States */
     .view { display: none; }
     .view.active { display: block; }
 
-    /* Create form */
     textarea {
       width: 100%;
       min-height: 130px;
@@ -161,34 +57,7 @@
 
     select:hover { border-color: #2d2d35; }
 
-    .btn-create {
-      margin-left: auto;
-      background: #fafafa;
-      color: #09090b;
-      border: none;
-      border-radius: 8px;
-      padding: 0.55rem 1.3rem;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.15s, opacity 0.15s;
-    }
-
-    kbd {
-      display: inline-block;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.65rem;
-      font-weight: 400;
-      color: inherit;
-      opacity: 0.45;
-      margin-left: 0.3rem;
-      vertical-align: baseline;
-    }
-
-    .btn-create:hover { transform: translateY(-1px); opacity: 0.92; }
-    .btn-create:active { transform: translateY(0); }
-    .btn-create:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+    .btn-create { margin-left: auto; }
 
     .error-msg {
       color: #ef4444;
@@ -199,7 +68,6 @@
 
     .error-msg.visible { display: block; }
 
-    /* Result view */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
@@ -244,99 +112,16 @@
       margin-bottom: 0.85rem;
     }
 
-    .btn-copy {
-      width: 100%;
-      background: #fafafa;
-      color: #09090b;
-      border: none;
-      border-radius: 8px;
-      padding: 0.6rem;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.15s, opacity 0.15s;
-    }
-
-    .btn-copy:hover { transform: translateY(-1px); opacity: 0.92; }
-    .btn-copy:active { transform: translateY(0); }
-    .btn-copy.copied { background: #22c55e; color: #fff; }
-
-    .result-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 0.85rem;
-    }
-
-    .result-note {
-      font-size: 0.7rem;
-      color: #3f3f46;
-    }
-
-    .btn-new {
-      background: none;
-      border: none;
-      color: #52525b;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.72rem;
-      cursor: pointer;
-      padding: 0;
-      transition: color 0.15s;
-    }
-
-    .btn-new:hover { color: #71717a; }
-
-    /* Footer */
-    .footer {
-      text-align: center;
-      margin-top: 3rem;
-      font-size: 0.72rem;
-      color: #3f3f46;
-      line-height: 1.8;
-    }
-
-    .footer a {
-      color: #52525b;
-      text-decoration: none;
-      transition: color 0.15s;
-    }
-
-    .footer a:hover { color: #71717a; }
-
-    /* Tablet */
-    @media (max-width: 768px) {
-      kbd { display: none; }
-      body { padding: 1.25rem; }
-      .brand { margin-bottom: 2rem; }
-      .brand-icon { width: 44px; height: 44px; }
-    }
-
-    /* Mobile */
     @media (max-width: 480px) {
-      body { padding: 1rem 0.85rem; }
-      .container { max-width: 100%; }
-      .brand { margin-bottom: 1.75rem; }
-      .brand-icon { width: 40px; height: 40px; margin-bottom: 0.75rem; }
-      .brand h1 { font-size: 1.2rem; }
-      .brand p { font-size: 0.78rem; }
       textarea { min-height: 110px; font-size: 0.8rem; padding: 0.75rem; }
       .form-row { flex-wrap: wrap; gap: 0.5rem; }
-      .btn-create { width: 100%; margin-left: 0; padding: 0.65rem; }
+      .btn-create { width: 100%; margin-left: 0; }
       select { flex: 1; padding: 0.6rem 0.7rem; }
       .url-box { font-size: 0.65rem; padding: 0.65rem 0.75rem; }
-      .result-note { font-size: 0.68rem; }
-      .agent-toggle { margin-top: 1.5rem; }
-      .agent-panel { padding: 0.75rem; font-size: 0.68rem; }
-      .agent-panel code { font-size: 0.62rem; }
-      .footer { margin-top: 2rem; font-size: 0.65rem; }
+      .action-note { font-size: 0.68rem; }
     }
 
-    /* Small phones */
     @media (max-width: 360px) {
-      body { padding: 0.75rem; }
-      .brand-icon { width: 36px; height: 36px; }
-      .brand h1 { font-size: 1.1rem; }
       textarea { min-height: 100px; font-size: 0.75rem; }
       .url-box { font-size: 0.6rem; }
     }
@@ -368,7 +153,6 @@
       <p>Send secrets between humans and agents.<br/>Encrypted. One-time. Self-destructing.</p>
     </div>
 
-    <!-- Create view -->
     <div class="view active" id="view-create">
       <form id="create-form">
         <textarea id="secret" placeholder="Paste your secret here..." required spellcheck="false" autocomplete="off"></textarea>
@@ -379,24 +163,33 @@
             <option value="259200">3 days</option>
             <option value="604800">7 days</option>
           </select>
-          <button type="submit" class="btn-create" id="submit-btn">Create link <kbd>&#8984;&#9166;</kbd></button>
+          <button type="submit" class="btn-primary btn-create" id="submit-btn">Create link <kbd>&#8984;&#9166;</kbd></button>
         </div>
       </form>
       <div class="error-msg" id="error"></div>
     </div>
 
-    <!-- Result view -->
     <div class="view" id="view-result">
       <div class="result-card">
         <div class="result-status">
           <div class="result-dot"></div>
           <div class="result-title">Link created — works once, then it's gone.</div>
         </div>
-        <div class="url-box" id="result-url"></div>
-        <button class="btn-copy" id="copy-btn">Copy link <kbd>C</kbd></button>
-        <div class="result-footer">
-          <div class="result-note">E2E encrypted</div>
-          <button class="btn-new" id="new-btn">New secret <kbd>N</kbd></button>
+        <div class="copy-row">
+          <div class="url-box copy-box" id="result-url"></div>
+          <button class="copy-btn" id="copy-btn" type="button" aria-label="Copy link" title="Copy link (C)">
+            <svg class="copy-icon copy-icon-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="9" y="9" width="13" height="13" rx="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            <svg class="copy-icon copy-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="action-footer">
+          <div class="action-note">E2E encrypted</div>
+          <button class="btn-secondary" id="new-btn">New secret <kbd>N</kbd></button>
         </div>
       </div>
     </div>
@@ -501,9 +294,14 @@
 
     copyBtn.addEventListener("click", async () => {
       await navigator.clipboard.writeText(resultUrl.textContent);
-      copyBtn.innerHTML = "Copied!";
       copyBtn.classList.add("copied");
-      setTimeout(() => { copyBtn.innerHTML = "Copy link <kbd>C</kbd>"; copyBtn.classList.remove("copied"); }, 2000);
+      copyBtn.setAttribute("aria-label", "Copied");
+      copyBtn.setAttribute("title", "Copied");
+      setTimeout(() => {
+        copyBtn.classList.remove("copied");
+        copyBtn.setAttribute("aria-label", "Copy link");
+        copyBtn.setAttribute("title", "Copy link (C)");
+      }, 2000);
     });
 
     document.getElementById("new-btn").addEventListener("click", () => {
@@ -515,9 +313,7 @@
       document.getElementById("agent-panel").classList.toggle("visible");
     });
 
-    // Keyboard shortcuts
     document.addEventListener("keydown", (e) => {
-      // Cmd/Ctrl+Enter: submit form
       if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
         e.preventDefault();
         if (document.getElementById("view-create").classList.contains("active")) {
@@ -525,7 +321,6 @@
         }
       }
 
-      // C: copy link (when result is visible and not typing)
       if (e.key === "c" && !e.metaKey && !e.ctrlKey && document.getElementById("view-result").classList.contains("active")) {
         if (document.activeElement?.tagName !== "TEXTAREA" && document.activeElement?.tagName !== "INPUT") {
           e.preventDefault();
@@ -533,7 +328,6 @@
         }
       }
 
-      // N: create another (when result is visible and not typing)
       if (e.key === "n" && !e.metaKey && !e.ctrlKey && document.getElementById("view-result").classList.contains("active")) {
         if (document.activeElement?.tagName !== "TEXTAREA" && document.activeElement?.tagName !== "INPUT") {
           e.preventDefault();
