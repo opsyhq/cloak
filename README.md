@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@opsyhq/cloak"><img src="https://img.shields.io/npm/v/@opsyhq/cloak" alt="npm version"></a>
-  <a href="https://github.com/opsyhq/cloak/blob/main/LICENSE"><img src="https://img.shields.io/github/license/opsyhq/cloak" alt="license"></a>
+  <a href="https://github.com/opsyhq/cloak/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="license"></a>
   <a href="https://github.com/opsyhq/cloak/actions/workflows/deploy.yml"><img src="https://github.com/opsyhq/cloak/actions/workflows/deploy.yml/badge.svg" alt="deploy"></a>
 </p>
 
