@@ -390,7 +390,7 @@
             <option value="259200">3 days</option>
             <option value="604800">7 days</option>
           </select>
-          <button type="submit" class="btn-create" id="submit-btn">Create link</button>
+          <button type="submit" class="btn-create" id="submit-btn" title="Cmd+Enter">Create link</button>
         </div>
       </form>
       <div class="error-msg" id="error"></div>
@@ -406,10 +406,10 @@
         <div class="result-subtitle">Works once, then it's gone forever.</div>
         <div class="url-box">
           <div class="url-text" id="result-url"></div>
-          <button class="btn-copy" id="copy-btn">Copy</button>
+          <button class="btn-copy" id="copy-btn" title="Press C">Copy</button>
         </div>
         <div class="result-note">Encrypted in your browser. The server only stores the encrypted blob.</div>
-        <button class="btn-new" id="new-btn">Create another</button>
+        <button class="btn-new" id="new-btn" title="Press N">Create another</button>
       </div>
     </div>
 
@@ -525,6 +525,33 @@
 
     document.getElementById("agent-toggle").addEventListener("click", () => {
       document.getElementById("agent-panel").classList.toggle("visible");
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener("keydown", (e) => {
+      // Cmd/Ctrl+Enter: submit form
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault();
+        if (document.getElementById("view-create").classList.contains("active")) {
+          form.requestSubmit();
+        }
+      }
+
+      // C: copy link (when result is visible and not typing)
+      if (e.key === "c" && !e.metaKey && !e.ctrlKey && document.getElementById("view-result").classList.contains("active")) {
+        if (document.activeElement?.tagName !== "TEXTAREA" && document.activeElement?.tagName !== "INPUT") {
+          e.preventDefault();
+          copyBtn.click();
+        }
+      }
+
+      // N: create another (when result is visible and not typing)
+      if (e.key === "n" && !e.metaKey && !e.ctrlKey && document.getElementById("view-result").classList.contains("active")) {
+        if (document.activeElement?.tagName !== "TEXTAREA" && document.activeElement?.tagName !== "INPUT") {
+          e.preventDefault();
+          document.getElementById("new-btn").click();
+        }
+      }
     });
   </script>
 </body>
