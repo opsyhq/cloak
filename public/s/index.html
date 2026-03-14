@@ -200,8 +200,7 @@
 
     <div id="agent-content" style="display:none">
       <div class="agent-panel">
-        <p>URL: <code>https://cloak.opsy.sh/s/{ID}#{KEY}</code></p>
-        <p>Retrieve: <code>curl -s -H "X-Cloak-Key: {KEY}" ".../api/secrets/{ID}"</code></p>
+        <p>Retrieve: <code id="agent-curl"></code></p>
         <p>Response: <code>{ "secret": "..." }</code> — destroyed after one read.</p>
       </div>
     </div>
@@ -246,6 +245,9 @@
     const pathParts = location.pathname.split("/");
     const secretId = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
     const encryptionKey = location.hash.slice(1);
+
+    document.getElementById("agent-curl").textContent =
+      `curl -s -H "X-Cloak-Key: ${encryptionKey}" "${location.origin}/api/secrets/${secretId}"`;
 
     if (!secretId || !encryptionKey) {
       showError("Invalid link — missing secret ID or encryption key.");
