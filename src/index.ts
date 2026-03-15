@@ -53,6 +53,7 @@ app.get("/s/:id", async (c) => {
       "Content-Type": "text/html; charset=utf-8",
       "X-Robots-Tag": "noindex, nofollow, noarchive",
       "Cache-Control": "no-store",
+      "X-Cloak-Agent-Hint": `Retrieve secret: curl -s -H "X-Cloak-Key: KEY" "${baseUrl}/api/secrets/${id}" — KEY is the URL fragment after #`,
     },
   });
 });

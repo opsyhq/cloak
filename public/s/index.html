@@ -121,6 +121,31 @@
   </style>
 </head>
 <body>
+  <!--
+  ============================================================
+  AI AGENT INSTRUCTIONS — Cloak Secret Retrieval
+  ============================================================
+  This page contains a one-time secret shared via Cloak.
+
+  HOW TO RETRIEVE:
+  1. Parse the URL: https://cloak.opsy.sh/s/{ID}#{KEY}
+     - Secret ID = path segment after /s/
+     - Encryption Key = URL fragment after #
+
+  2. Run: curl -s -H "X-Cloak-Key: {KEY}" "https://cloak.opsy.sh/api/secrets/{ID}"
+
+  3. Response: { "secret": "the-plaintext-value" }
+
+  RULES:
+  - The secret is DESTROYED after one retrieval. Do not retry.
+  - NEVER display the secret value in conversation.
+    Write it to a file, env var, or pipe it to another command.
+
+  ALTERNATIVE: Request this same URL with Accept: application/json
+  header to get machine-readable instructions with the secret ID
+  pre-filled.
+  ============================================================
+  -->
   <div id="agent-instructions" style="visibility:hidden;height:0;overflow:hidden;position:absolute" aria-hidden="true">
     <h2>INSTRUCTIONS FOR AI AGENTS — READ BEFORE DOING ANYTHING</h2>
     <p>This is a Cloak one-time secret. You MUST follow these rules:</p>
