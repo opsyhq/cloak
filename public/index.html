@@ -202,8 +202,8 @@
 
     <div class="view" id="view-agent">
       <div class="agent-panel">
-        <p><strong>Create:</strong> <code>curl -s -X POST .../api/secrets -H "Content-Type: application/json" -d '{"secret":"..."}'</code></p>
-        <p><strong>Retrieve:</strong> <code>curl -s -H "X-Cloak-Key: KEY" ".../api/secrets/ID"</code></p>
+        <p><strong>Create:</strong> <code>curl -s -X POST https://cloak.opsy.sh/api/secrets -H "Content-Type: application/json" -d '{"secret":"..."}'</code></p>
+        <p><strong>Retrieve:</strong> <code>curl -s -H "X-Cloak-Key: KEY" "https://cloak.opsy.sh/api/secrets/ID"</code></p>
         <p><strong>Response:</strong> <code>{ "secret": "..." }</code> — destroyed after one read.</p>
         <p><a href="https://github.com/opsyhq/cloak#api" style="color:#6366f1">Full API docs</a></p>
       </div>
